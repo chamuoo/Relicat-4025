@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 489d9d4e1ffaf61428bded619945edd2, type: 3}
+  m_Name: Pickaxe
+  m_EditorClassIdentifier: 
+  type: 16
+  weaponName: 
+  explanation: 
+  icon: {fileID: 21300000, guid: f37e914b8dfe93048b4b1f364763ceba, type: 3}
+  levelSprite:
+  - level: 1
+    sprite: {fileID: 21300000, guid: f37e914b8dfe93048b4b1f364763ceba, type: 3}
+  - level: 15
+    sprite: {fileID: 21300000, guid: 4708595cdc20289498d2a9a95e0d7e52, type: 3}
+  - level: 25
+    sprite: {fileID: 21300000, guid: 66881f593f024084a96ad4499142c339, type: 3}
+  - level: 40
+    sprite: {fileID: 21300000, guid: 4156db76b26132942adcbc26bc53fd07, type: 3}
+  - level: 50
+    sprite: {fileID: 21300000, guid: 31be56298c52fad4ea29404dd5947d30, type: 3}
+  damage: 6
+  level: 1
+  range: 0
+  energy: -1

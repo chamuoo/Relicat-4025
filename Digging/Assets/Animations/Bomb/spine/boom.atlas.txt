@@ -1,0 +1,18 @@
+boom.png
+size:2048,1024
+filter:Linear,Linear
+pma:true
+ef_boom 1
+bounds:2,379,540,541
+offsets:1,1,543,543
+ef_boom 2
+bounds:544,391,528,529
+ef_boom 3
+bounds:1074,682,238,238
+offsets:2,3,242,244
+ef_boom 4
+bounds:2,2,374,375
+offsets:3,3,380,381
+ef_boom 5
+bounds:1074,481,198,199
+offsets:5,6,209,212

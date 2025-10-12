@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.UIElements;
 using UnityEngine;
 
 [System.Serializable]
@@ -16,14 +13,6 @@ public class ItemInstance
         _item = item;
         itemImage = item.itemImage;
         _count = item.count;
-        //_count = item.accumulation_count; // 나중에 갯수제한이나 데이터 교환이 있다면 필요함.
-    }
-
-    public ItemInstance(Item item, int count)
-    {
-        _item = item;
-        itemImage = item.itemImage;
-        _count = count;
     }
 
     public Sprite GetSprite()
@@ -34,6 +23,61 @@ public class ItemInstance
         return null;
     }
 
+    public void AddItemCount(int num)
+    {
+        _count += num;
+    }
+
     #endregion Field
 
 }
+
+[System.Serializable]
+public class WeaponInstance
+{
+    #region Field
+    public WeaponTemplate _template;
+
+    public long _id;
+    public float _damage;
+    public int _level;
+    public float _energy; // 드릴만 필요
+    public Vector2 _range;
+
+    public Sprite itemImage;
+
+    #endregion // Field
+
+    #region Method
+
+    public WeaponInstance(WeaponTemplate template)
+    {
+        _template = template;
+        _id = ItemIDGenerator.Generate(template.type);
+
+        _level = 1;
+        _damage = template.damage;
+        _energy = template.type == ItemTypes.Drill ? 100 : -1;
+        _range = new Vector2(1, 1);
+
+        itemImage = template.icon;
+    }
+
+    // [무기] 
+    public Sprite GetSprite()
+    {
+        if(_template != null)
+        {
+            return _template.GetSpriteForLevel(_level);
+        }
+
+        return null;
+    }
+
+    public void AddDamge(float add)
+    {
+        _damage += add;
+    }
+}
+
+#endregion // Method

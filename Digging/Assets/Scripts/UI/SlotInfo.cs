@@ -1,4 +1,7 @@
+using System;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum SlotType
 {
@@ -7,63 +10,82 @@ public enum SlotType
     Inventory
 }
 
+public enum ItemTypes
+{
+    Null = 0,
+
+    // Weapon (index: 0~)
+    Pickaxe = ItemCategory.Weapon | 0,
+    Drill = ItemCategory.Weapon | 1,
+
+    // Item (index: 0~)
+    Bomb = ItemCategory.Item | 0,
+    Lamp = ItemCategory.Item | 1,
+    Teleport = ItemCategory.Item | 2,
+    
+}
+
+[System.Serializable]
+public class SlotData
+{
+    public WeaponInstance weapon;
+    public ItemInstance item;
+
+    public object ActiveInstance
+    {
+        get
+        {
+            if(weapon != null) return weapon;
+            if(item != null) return item;
+            return null;
+        }
+    }
+}
+
 public class SlotInfo : MonoBehaviour
 {
     public int _index;
     public SlotType _typeS;
-    public ItemType _typeI;
-    public WeaponType _typeW;
+    public ItemTypes _type;
 
-    public WeaponInstance _instanceW = null;
-    public ItemInstance _instanceI = null;
+    public SlotData slot { get; set; }
 
-    public void Initialize(SlotType type, int index)
+    [SerializeField] SlotBackground background;
+    [SerializeField] SlotInteraction action;
+
+    public void SetImage(Item item)
     {
-        _index = index;
-        _typeS = type;
-        _instanceW = null;
-        _instanceI = null;
+        Image icon = action.GetComponent<Image>();
 
-        // 인덱스에 따라서 무기와 아이템 타입 지정하기(해당 지정석에만 아이템 채우기)
-        switch(index)
-        {
-            case 0:
-                _typeW = WeaponType.Pickaxe;
-                _typeI = ItemType.Null;
-                break;
-            case 1:
-                _typeW = WeaponType.Null;
-                _typeI = ItemType.Bomb;
-                break;
-            case 2:
-                _typeW = WeaponType.Null;
-                _typeI = ItemType.Torch;
-                break;
-            case 3:
-                _typeW = WeaponType.Null;
-                _typeI = ItemType.Teleport;
-                break;
-            case 4:
-                _typeW = WeaponType.Drill;
-                _typeI = ItemType.Null;
-                break;
-            default:
-                _typeW = WeaponType.Null;
-                _typeI = ItemType.Null;
-                break;
-        }
+        icon.color = new Color(1, 1, 1, 1);
+        icon.sprite = item.itemImage;
+    }
+
+    public void SetSlotImage()
+    {
+        action.Apply(this);
+    }
+
+    public void Select()
+    {
+        background.Highlight();
+    }
+
+    public void Deselect()
+    {
+        background.Unhighlight();
+    }
+
+    public void ClearSlot()
+    {
+        slot = null;
+        background.Unhighlight();
+        action.Clear();
     }
 
     public SlotInfoData ToData()
     {
-        return new SlotInfoData(_index, _typeS, _instanceW, _instanceI);
+        return new SlotInfoData(_index, _typeS, slot);
     }
 
-    public void RestoreFromData(SlotInfoData data)
-    {
-        _index = data.index;
-        _typeS = data.type;
-        _instanceW = data.instanceW;
-        _instanceI = data.instanceI;
-    }
 }

@@ -7336,7 +7336,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1167482397873287916}
   - component: {fileID: 3832459934527402193}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: floorBox
   m_TagString: Floor
   m_Icon: {fileID: 0}

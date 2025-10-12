@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour
     float timer = 1f;
     float speed = 1f;
 
-    public int damage = 1;
+    public int damage = 50;
 
     float attackCooldown = 1f;
 
@@ -62,7 +62,7 @@ public class Enemy : MonoBehaviour
                 attackCooldown = 1f;
 
                 //플레이어가 대미지 입는 함수 호출 필요
-                playerScript.TakeDamage(damage, transform);
+                playerScript.TakeDamage(damage, transform.position);
             }
         }
         else if(collision.tag == "Enemy")
@@ -83,7 +83,7 @@ public class Enemy : MonoBehaviour
                 attackCooldown = 1f;
 
                 //플레이어가 대미지 입는 함수 호출 필요
-                playerScript.TakeDamage(damage, transform);
+                playerScript.TakeDamage(damage, transform.position);
             }
         }
         else if(collision.tag == "Enemy")

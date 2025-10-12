@@ -1,15 +1,7 @@
-
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
-
-public enum WeaponType
-{
-    Null,
-    Pickaxe,
-    Drill
-}
 
 [System.Serializable]
 public class LevelSprite
@@ -23,16 +15,16 @@ public class WeaponTemplate : ScriptableObject
 {
     #region Field
     [Header("공통 정보")]
-    public string id;
-    public string name;
-    public WeaponType type;
+    public ItemTypes type;
+    public string weaponName;
+    public string explanation;
     public Sprite icon;
     public List<LevelSprite> levelSprite;
 
     [Header("스탯(RunTime)")]
     public float damage;
     public int level;
-    public Vector2 range;
+    public float range;
     public float energy;    // 드릴만 필요
     #endregion // Field
 

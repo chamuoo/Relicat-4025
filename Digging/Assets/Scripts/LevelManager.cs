@@ -138,7 +138,15 @@ public class LevelManager : MonoBehaviour
         }
         Debug.Log("asdfaeaafsa11111111111111");
 
-        if(scene.buildIndex != 3) return;
+        if(scene.buildIndex > 1 && scene.buildIndex < 6)
+        {
+            UIController.Instance.Initialize();
+        }
+
+        if(scene.buildIndex != 3)
+        {
+            return;
+        }
         if(scene.buildIndex == 3)
         {
             Toggle_GuidePanel();
@@ -178,15 +186,16 @@ public class LevelManager : MonoBehaviour
             stagetargetNumText.color = Color.green;
             stagetimerText.color = Color.green;
 
+            player.GetComponent<PlayerController>().DisableControls();
             isRunning = false;
             SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[37]);
             isStageClear = true;
 
-            if (LoadScene.instance.stage_Level == 0)
+            if(LoadScene.instance.stage_Level == 0)
             {
                 ClearStagePanel_1.SetActive(true);
             }
-            else if (LoadScene.instance.stage_Level == 1)
+            else if(LoadScene.instance.stage_Level == 1)
             {
                 ClearStagePanel_2.SetActive(true);
             }
@@ -194,8 +203,6 @@ public class LevelManager : MonoBehaviour
             {
                 ClearStagePanel_3.SetActive(true);
             }
-            
-            collection.player.player.input.Disable();
         }
         
         if(SceneManager.GetActiveScene().buildIndex > 2 && stagetargetUI.activeSelf == true && !isStageClear)
@@ -256,12 +263,13 @@ public class LevelManager : MonoBehaviour
     public void EndingSequence()
     {
         isOnEnding = true;
-
         SaveSystem.Instance.DeleteSaveFile();
         LoadScene.instance.isAlreadyWatchStory = false;
         ResetGame();
         shop.createDrill_textobj.SetActive(true);
         shop.upgradeDrill_textobj.SetActive(false);
+        UIController.Instance.SetObjectActive(0, false);    // 퀵슬롯 
+        UIController.Instance.SetObjectActive(1, false);    // 깊이
         Collection.instance.player.Inventory_obj.SetActive(false);
         Collection.instance.player.CollectUIPanel.SetActive(false);
         //Inventory.badgePanel.SetActive(false);
@@ -279,12 +287,13 @@ public class LevelManager : MonoBehaviour
         LoadScene.instance.stage_Level = 0;
         ClearStagePanel_3.SetActive(false);
         EndingButton.SetActive(false);
-        SlotManager.Instance.quitSlotUI.ResetQuickSlot();
+        //SlotManager.Instance.quitSlotUI.ResetQuickSlot();
     }
 
     public void GoNextStageButton()
     {
         LoadScene.instance.stage_Level += 1;
+
         if (LoadScene.instance.stage_Level == 0)
         {
             remainingTime = totalTime_1;
@@ -308,17 +317,15 @@ public class LevelManager : MonoBehaviour
 
         //ClearStagePanel_1.SetActive(false);
         NextStageButton.SetActive(false);
-        collection.player.player.input.Enable();
 
         SaveSystem.Instance.Save();
         LoadScene.instance.GoMain();
-
-        SlotManager.Instance.currentWeapon = null;
     }
 
     public void ContinueStageButton1()
     {
-        collection.player.player.input.Enable();
+        player.GetComponent<PlayerController>().EnableControls();
+
         ClearStagePanel_1.SetActive(false);
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[28]);
         SaveSystem.Instance.Save();
@@ -327,7 +334,8 @@ public class LevelManager : MonoBehaviour
 
     public void ContinueStageButton2()
     {
-        collection.player.player.input.Enable();
+        player.GetComponent<PlayerController>().EnableControls();
+
         ClearStagePanel_2.SetActive(false);
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[28]);
         SaveSystem.Instance.Save();
@@ -336,7 +344,8 @@ public class LevelManager : MonoBehaviour
 
     public void ContinueStageButton3()
     {
-        collection.player.player.input.Enable();
+        player.GetComponent<PlayerController>().EnableControls();
+
         ClearStagePanel_3.SetActive(false);
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[28]);
         SaveSystem.Instance.Save();
@@ -365,7 +374,6 @@ public class LevelManager : MonoBehaviour
         isStageClear = false;
 
         ClearStagePanel_1.SetActive(false);
-        collection.player.player.input.Enable();
 
         LoadScene.instance.GoMenu();
         SaveSystem.Instance.Save();
@@ -400,7 +408,7 @@ public class LevelManager : MonoBehaviour
         isStageClear = false;
 
         ClearStagePanel_2.SetActive(false);
-        collection.player.player.input.Enable();
+        collection.player.player.EnableControls();
 
         LoadScene.instance.GoMenu();
         SaveSystem.Instance.Save();
@@ -435,11 +443,10 @@ public class LevelManager : MonoBehaviour
         isStageClear = false;
 
         ClearStagePanel_3.SetActive(false);
-        collection.player.player.input.Enable();
+        collection.player.player.EnableControls();
 
         LoadScene.instance.GoMenu();
         SaveSystem.Instance.Save();
-
         stagetargetUI.SetActive(false);
         guide_Button.SetActive(false);
         pause_Button.SetActive(false);
@@ -588,8 +595,10 @@ public class LevelManager : MonoBehaviour
     // 게임 초기화
     public void ResetGame()
     {
+        SlotManager.Instance.quitSlotUI.ClearAllSlots();
+
         // 아이템 초기화
-        for (int i = 0; i < collection.player.items.Count; i++)
+        for(int i = 0; i < collection.player.items.Count; i++)
         {
             collection.player.items[i].count = 0;
             collection.player.items[i].accumulation_count = 0;

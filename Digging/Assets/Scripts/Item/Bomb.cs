@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.InputSystem.Controls.AxisControl;
 
 public class Bomb : MonoBehaviour
 {
@@ -10,13 +11,14 @@ public class Bomb : MonoBehaviour
     [SerializeField] Player playerScript;
     [SerializeField] private ItemInstance _instance;
 
+    private int damage = 100;
+
     // 카운트
-    float timer;
-    float countdown = 4f;
+    private float timer;
+    private float countdown = 4f;
 
     // 애니메이션
     Animator anim;
-    bool isCountingDown = false;
     bool hasExploded = false;
 
     // 폭발 범위
@@ -25,56 +27,40 @@ public class Bomb : MonoBehaviour
     // 사이즈 조절
     Vector3 originalScale;
 
-    float minScale = 0.5f;
-    float maxScale = 1.5f;
-    float pulseDuration = 1f; // 총 1초 주기
+    private float minScale = 0.5f;
+    private float maxScale = 1.5f;
+    private float pulseDuration = 1f; // 총 1초 주기
 
     // 폭탄 던지기
     private Rigidbody2D rb;
-
-    float throwForceX = 5f;
-    float throwForceY = 5f;
+    private float throwForceX = 5f;
+    private float throwForceY = 5f;
 
     private bool isGrounded = false;
     private bool isAlreadyDamaged = false;
 
-    public void Setup(ItemInstance instance)
-    {
-        _instance = instance;
-    }
-
     private void Awake()
     {
+        originalScale = Vector3.one;
+        rb = GetComponent<Rigidbody2D>();
         playerScript = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
         anim = GetComponent<Animator>();
         anim.enabled = false;
         audio = GetComponent<AudioSource>();
     }
 
-    private void OnEnable()
-    {
-        StartCountdown();
-    }
-
-    void StartCountdown()
-    {
-        timer = countdown;
-        isCountingDown = true;
-    }
-
     void Start()
     {
-        originalScale = Vector3.one;
-        rb = GetComponent<Rigidbody2D>();
-        SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[18]);
+        timer = countdown;
 
         // 생성 후, 던지기
-        Throw(GetPlayerDirection());
+        //Throw(GetPlayerDirection());
+        SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[18]);
     }
 
     private void Update()
     {
-        if(!isCountingDown || hasExploded)
+        if(hasExploded)
         {
             transform.localScale = originalScale;
             return;
@@ -86,11 +72,11 @@ public class Bomb : MonoBehaviour
             Explode();
 
         // 시간 비율 계산 (0 ~ 1 ~ 0 반복)
-        float t = Mathf.PingPong(Time.time / pulseDuration, 1f);
-        float scale = Mathf.SmoothStep(minScale, maxScale, t);
+        //float t = Mathf.PingPong(Time.time / pulseDuration, 1f);
+        //float scale = Mathf.SmoothStep(minScale, maxScale, t);
 
-        Vector3 newScale = originalScale * scale;
-        transform.localScale = newScale;
+        //Vector3 newScale = originalScale * scale;
+        //transform.localScale = newScale;
     }
 
     Vector2 GetPlayerDirection()
@@ -187,7 +173,7 @@ public class Bomb : MonoBehaviour
         Vector2 explosionCenter = transform.position;
         Vector2 explosionHalfSize = explosionSize * 0.5f;
 
-        //DrawDebugBox(transform.position, explosionSize, Color.red);
+        DrawDebugBox(transform.position, explosionSize, Color.red);
 
         // 3. 충돌 감지 (전체 대상)
         Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, explosionSize, 0f);
@@ -209,7 +195,6 @@ public class Bomb : MonoBehaviour
             if(!isInsideExplosion)
                 continue;
 
-
             string tag = hit.tag;
 
             switch(tag)
@@ -226,8 +211,8 @@ public class Bomb : MonoBehaviour
                     TryDamagePlayer(hit);
                     break;
 
-                case "Torch":
-                    TryTriggerTorch(hit);
+                case "Lamp":
+                    TryTriggerLamp(hit);
                     break;
                 default:
                     break;
@@ -260,17 +245,18 @@ public class Bomb : MonoBehaviour
         PlayerController player = hit.GetComponent<PlayerController>();
         if(player != null)
         {
-            player.TakeDamage(1, transform);
+            player.TakeDamage(damage, transform.position);
             isAlreadyDamaged = true;
         }
     }
 
-    void TryTriggerTorch(Collider2D hit)
+    void TryTriggerLamp(Collider2D hit)
     {
-        Torch torch = hit.GetComponent<Torch>();
-        if(torch != null)
+        Lamp lamp = hit.GetComponent<Lamp>();
+        if(lamp != null)
         {
-            torch.CheckBelowAndDrop();
+            Tool.Instance.torchObj.Remove(lamp.gameObject);
+            Destroy(lamp.gameObject);
         }
     }
 

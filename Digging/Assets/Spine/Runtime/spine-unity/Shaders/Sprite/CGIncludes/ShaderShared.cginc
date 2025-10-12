@@ -263,25 +263,25 @@ uniform fixed _Cutoff;
 // Additive Slot blend mode
 // return unlit textureColor, alpha clip textureColor.a only
 //
-// [Deprecated] RETURN_UNLIT_IF_ADDITIVE_SLOT macro will be removed in future versions.
-// Use RETURN_UNLIT_IF_ADDITIVE_SLOT_TINT instead.
+// [Deprecated] RETURN_UNLIT_IF_ADDITIVESlot macro will be removed in future versions.
+// Use RETURN_UNLIT_IF_ADDITIVESlot_TINT instead.
 #if defined(_ALPHAPREMULTIPLY_ON) && !defined(_LIGHT_AFFECTS_ADDITIVE)
-	#define RETURN_UNLIT_IF_ADDITIVE_SLOT(textureColor, vertexColor) \
+	#define RETURN_UNLIT_IF_ADDITIVESlot(textureColor, vertexColor) \
 	if (vertexColor.a == 0 && (vertexColor.r || vertexColor.g || vertexColor.b)) {\
 		ALPHA_CLIP(texureColor, fixed4(1, 1, 1, 1))\
 		return texureColor * vertexColor;\
 	}
 #elif defined(_ALPHAPREMULTIPLY_VERTEX_ONLY) && !defined(_LIGHT_AFFECTS_ADDITIVE)
-	#define RETURN_UNLIT_IF_ADDITIVE_SLOT(textureColor, vertexColor) \
+	#define RETURN_UNLIT_IF_ADDITIVESlot(textureColor, vertexColor) \
 	if (vertexColor.a == 0 && (vertexColor.r || vertexColor.g || vertexColor.b)) {\
 		ALPHA_CLIP(texureColor, fixed4(1, 1, 1, 1))\
 		return texureColor * texureColor.a * vertexColor;\
 	}
 #else
-	#define RETURN_UNLIT_IF_ADDITIVE_SLOT(textureColor, vertexColor)
+	#define RETURN_UNLIT_IF_ADDITIVESlot(textureColor, vertexColor)
 #endif
 
-// Replacement for deprecated RETURN_UNLIT_IF_ADDITIVE_SLOT macro.
+// Replacement for deprecated RETURN_UNLIT_IF_ADDITIVESlot macro.
 #if (defined(_ALPHAPREMULTIPLY_ON) || defined(_ALPHAPREMULTIPLY_VERTEX_ONLY)) && !defined(_LIGHT_AFFECTS_ADDITIVE)
 	#if defined(_TINT_BLACK_ON)
 		#define TINTED_RESULT_PIXEL(textureColor, vertexColor, darkVertexColor, lightColorA, darkColorA) fragTintedColor(texureColor, darkVertexColor, vertexColor, lightColorA, darkColorA)
@@ -291,13 +291,13 @@ uniform fixed _Cutoff;
 		#define TINTED_RESULT_PIXEL(textureColor, vertexColor, darkVertexColor, lightColorA, darkColorA) (texureColor * vertexColor)
 	#endif
 
-	#define RETURN_UNLIT_IF_ADDITIVE_SLOT_TINT(textureColor, vertexColor, darkVertexColor, lightColorA, darkColorA) \
+	#define RETURN_UNLIT_IF_ADDITIVESlot_TINT(textureColor, vertexColor, darkVertexColor, lightColorA, darkColorA) \
 	if (vertexColor.a == 0 && (vertexColor.r || vertexColor.g || vertexColor.b)) {\
 		ALPHA_CLIP(texureColor, fixed4(1, 1, 1, 1))\
 		return TINTED_RESULT_PIXEL(textureColor, vertexColor, darkVertexColor, lightColorA, darkColorA);\
 	}
 #else
-	#define RETURN_UNLIT_IF_ADDITIVE_SLOT_TINT(textureColor, vertexColor, darkVertexColor, lightColorA, darkColorA)
+	#define RETURN_UNLIT_IF_ADDITIVESlot_TINT(textureColor, vertexColor, darkVertexColor, lightColorA, darkColorA)
 #endif
 
 ////////////////////////////////////////

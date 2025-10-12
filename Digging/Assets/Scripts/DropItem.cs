@@ -101,18 +101,16 @@ public class DropItem : MonoBehaviour
                 else if(itemType == 2) // 이 아이템이 사용 아이템이라면
                 {
                     playerScript.Inventory.AddItem(playerScript.UseItems[itemCode], addEA);
+                    SlotManager.Instance.InvenFillSlot();
 
-                    switch(playerScript.UseItems[itemCode].type)
+                    /*int typeValue = (int)playerScript.UseItems[itemCode].type;
+
+                    // 일반적인 값을 가지고 비교연산을 하면 Wepaon도 들어갈 가능성이 있기에 비트 마스크로 함.
+                    // 예를 들어 Weapon이 16이고 Item이 10부터 시작하면 값을 비교를 할 때 weapon의 값이 10이상이기 때문에 weapon 타입이 들어갈 수 있음.
+                    if((typeValue & (int)ItemCategory.Item) == (int)ItemCategory.Item)
                     {
-                        case ItemType.Bomb:
-                        case ItemType.Torch:
-                        case ItemType.Teleport:
-                            SlotManager.Instance.ItemPick(playerScript.UseItems[itemCode], addEA); // 먹은 아이템 보내기
-                            break;
-                        default:
-                            break;
-                    }
-
+                        SlotManager.Instance.GiveItem(playerScript.UseItems[itemCode].type, addEA); // 먹은 아이템 보내기
+                    }*/
 
                     SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[13]);
                 }
@@ -128,27 +126,17 @@ public class DropItem : MonoBehaviour
                     if (playerScript.Drill_Items[itemCode] == playerScript.Drill_Items[4])
                     {
                         // 드릴이라는 아이템이 퀵슬롯에 있다면 배터리 채우기
-                        if(SlotManager.Instance.FindSlot(WeaponType.Drill) && Shop.instance.isCreateDrill == true)
+                        if(SlotManager.Instance.quitSlotUI.FindSlot(ItemTypes.Drill) && Shop.instance.isCreateDrill == true)
                         {
                             Inventory.instance.LogMessage("드릴의 배터리가 충전되었습니다.");
-                            if (SlotManager.Instance.currentWeapon != SlotManager.Instance.FindSlot(WeaponType.Drill))
-                            {
-                                SlotManager.Instance.EquipWeapon(SlotManager.Instance.FindSlot(WeaponType.Drill));
-                                Drill drill = playerScript.GetComponentInChildren<Drill>();
-                                drill.ChargeEnergy();
-                            }
-                            else
-                            {
-                                Drill drill = playerScript.GetComponentInChildren<Drill>();
-                                drill.ChargeEnergy();
-                            }
-                            SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[13]);
+                            SlotManager.Instance.ChargeEnergy();
                         }
                         else
                         {
                             print("드릴이라는 아이템이 없습니다.");
                             return;
                         }
+                        SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[13]);
                     }
                 }
 
@@ -183,18 +171,7 @@ public class DropItem : MonoBehaviour
                 else if (itemType == 2) // 이 아이템이 사용 아이템이라면
                 {
                     playerScript.Inventory.AddItem(playerScript.UseItems[itemCode], addEA);
-
-                    switch(playerScript.UseItems[itemCode].type)
-                    {
-                        case ItemType.Bomb:
-                        case ItemType.Torch:
-                        case ItemType.Teleport:
-                            SlotManager.Instance.ItemPick(playerScript.UseItems[itemCode], addEA); // 먹은 아이템 보내기
-                            break;
-                        default:
-                            break;
-                    }
-
+                    SlotManager.Instance.InvenFillSlot();
                     SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[13]);
                 }
                 else if (itemType == 3) // 이 아이템이 드릴 아이템이라면
@@ -207,28 +184,12 @@ public class DropItem : MonoBehaviour
                 {
                     if (playerScript.Drill_Items[itemCode] == playerScript.Drill_Items[4])
                     {
-                        // 드릴이라는 아이템이 퀵슬롯에 있다면 배터리 채우기
-                        if(SlotManager.Instance.FindSlot(WeaponType.Drill) && Shop.instance.isCreateDrill == true)
+                        if(SlotManager.Instance.quitSlotUI.FindSlot(ItemTypes.Drill) && Shop.instance.isCreateDrill == true)
                         {
                             Inventory.instance.LogMessage("드릴의 배터리가 충전되었습니다.");
-                            if (SlotManager.Instance.currentWeapon != SlotManager.Instance.FindSlot(WeaponType.Drill))
-                            {
-                                SlotManager.Instance.EquipWeapon(SlotManager.Instance.FindSlot(WeaponType.Drill));
-                                Drill drill = playerScript.GetComponentInChildren<Drill>();
-                                drill.ChargeEnergy();
-                            }
-                            else
-                            {
-                                Drill drill = playerScript.GetComponentInChildren<Drill>();
-                                drill.ChargeEnergy();
-                            }
-                            SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[13]);
+                            SlotManager.Instance.ChargeEnergy();
                         }
-                        else
-                        {
-                            print("드릴이라는 아이템이 없습니다.");
-                            return;
-                        }
+                        SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[13]);
                     }
                     
                 }

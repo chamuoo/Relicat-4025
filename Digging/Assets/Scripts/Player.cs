@@ -11,6 +11,8 @@ using UnityEditor.SearchService;
 
 using System.Collections.ObjectModel;
 using Unity.VisualScripting;
+using System;
+using UnityEngine.PlayerLoop;
 
 public class Player : MonoBehaviour
 {
@@ -97,6 +99,14 @@ public class Player : MonoBehaviour
 
     // 입력 액션
     public System.Action<bool> OnInventoryOpen;
+    public Action<float> OnHealthCange;
+
+    // 플레이어 HP
+    [SerializeField] PlayerHPBar hPBar;
+    public PlayerHPBar HP => hPBar;
+
+    // 로드했는지에 대한 여부
+    bool isLoaded = false;
 
     private string savePath => Application.persistentDataPath + "/SaveData.json";
 
@@ -136,25 +146,21 @@ public class Player : MonoBehaviour
     private void OnEnable()
     {
         SlotManager.Instance.OnInventoryOpen = SlotManager.Instance.HandleInventoryOpen;
+        OnHealthCange += hPBar.UpdateHP;
     }
 
     private void OnDisable()
     {
         SlotManager.Instance.OnInventoryOpen = null;
-    }
-
-    // 아이템 갯수 초기화
-    void InitItemCount()
-    {
-        for(int i = 0; i < UseItems.Count; i++)
-        {
-            UseItems[i].count = 0;
-        }
+        OnHealthCange -= hPBar.UpdateHP;
     }
 
     // Start is called before the first frame update
     private IEnumerator Start()
     {
+        player.EnableControls();
+        isLoaded = false;
+
         // UI 시작/도착 포지션 지정
         Inventory_StartPos = new Vector3(-200f, Screen.height / 2, 0f);
         Inventory_EndPos = new Vector3(0f, Screen.height / 2, 0f);
@@ -168,7 +174,6 @@ public class Player : MonoBehaviour
         Tool.Instance.torchObj.Clear();
         // 한 프레임 대기 (인스턴스 초기화 대기)
         yield return null;
-
 
         // Inventory 스크립트 연결
         Inventory = Inventory.Instance ?? FindObjectOfType<Inventory>();
@@ -188,46 +193,44 @@ public class Player : MonoBehaviour
             Debug.LogError("Inventory 연결 실패: Inventory.Instance가 null입니다.");
         }
 
-
         if(Inventory != null)
         {
-            Transform collectionParent = Inventory.transform.Find("HealthPanel");
-            if(collectionParent != null)
-            {
-                li_PlayerHearts = new GameObject[3];
-                for(int i = 0; i < li_PlayerHearts.Length; i++)
-                {
-                    Transform child = collectionParent.Find(i.ToString());
-                    if(child != null)
-                    {
-                        li_PlayerHearts[i] = child.gameObject;
-                        DicPlayerHeart[li_PlayerHearts[i].name] = true;
-                        li_PlayerHearts[i].SetActive(true);
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"li_PlayerHearts[{i}] 오브젝트를 찾을 수 없습니다.");
-                    }
-                }
+            /*Transform collectionParent = Inventory.transform.Find("HealthPanel");
+            //if(collectionParent != null)
+            //{
+            //    li_PlayerHearts = new GameObject[3];
+            //    for(int i = 0; i < li_PlayerHearts.Length; i++)
+            //    {
+            //        Transform child = collectionParent.Find(i.ToString());
+            //        if(child != null)
+            //        {
+            //            li_PlayerHearts[i] = child.gameObject;
+            //            DicPlayerHeart[li_PlayerHearts[i].name] = true;
+            //            li_PlayerHearts[i].SetActive(true);
+            //        }
+            //        else
+            //        {
+            //            Debug.LogWarning($"li_PlayerHearts[{i}] 오브젝트를 찾을 수 없습니다.");
+            //        }
+            //    }
 
-            }
+            //}
+            */
         }
 
+        SlotManager.Instance.quitSlotUI.InitFillData();
         Inventory_obj.transform.position = new Vector3(-200f, Screen.height / 2, 0f);
         shopUIPanel.transform.position = new Vector3(2420f, Screen.height / 2, 0f);
         CollectUIPanel.transform.position = new Vector3(3420f, Screen.height / 2, 0f);
-
         Inventory_obj.SetActive(true);
         CollectUIPanel.SetActive(true);
         Inventory.badgePanel.gameObject.SetActive(true);
         Inventory.moneyPanel.gameObject.SetActive(true);
-        Inventory.healthPanel.gameObject.SetActive(true);
+        //Inventory.healthPanel.gameObject.SetActive(true);
         LevelManager.instance.stagetargetUI.SetActive(true);
         LevelManager.instance.guide_Button.SetActive(true);
         LevelManager.instance.pause_Button.SetActive(true);
         LevelManager.instance.isRunning = true;
-
-        player.input.Enable();
 
         if(LevelManager.instance.isClickReset)
         {
@@ -239,18 +242,27 @@ public class Player : MonoBehaviour
             if(LoadScene.instance.isUseContinue == true)
             {
                 LoadScene.instance.isUseContinue = false;
+                Inventory.FreshSlot();
                 SaveSystem.Instance.Load();
+                isLoaded = true;
             }
             //SaveSystem.Instance.Save();
         }
         else
         {
-            SaveSystem.Instance.Load();
+            if(File.Exists(savePath))
+            {
+                SlotManager.Instance.quitSlotUI.ClearAllSlots();
+                Inventory.FreshSlot();
+                SaveSystem.Instance.Load();
+                isLoaded = true;
+            }
         }
 
         // 첫 Level의 아이템 드랍
-        if(SceneManager.GetActiveScene().buildIndex == 3)
+        if(!isLoaded && SceneManager.GetActiveScene().buildIndex == 3)
         {
+            SlotManager.Instance.quitSlotUI.ClearAllSlots();
             LevelManager.instance.GuidePanel.SetActive(true);
             LevelManager.instance.guideView_idx = 0;
             LevelManager.instance.isOnGuide = true;
@@ -267,13 +279,14 @@ public class Player : MonoBehaviour
 
             Inventory.AddItem(UseItems[0], 3);
             Inventory.AddItem(UseItems[1], 10);
+
             //SaveSystem.Instance.Save();
         }
 
-        SlotManager.Instance.currentWeapon = null;
-
-        SlotManager.Instance.BindPlayer(this);  // Player 다시 참조
-        SlotManager.Instance.Init();    // 레벨에 따른 아이템 초기화
+        if(!isLoaded)
+        {
+            SlotManager.Instance.Initialize();
+        }
 
         if(!File.Exists(savePath))
         {
@@ -284,7 +297,6 @@ public class Player : MonoBehaviour
         {
             string jsonForLoad = File.ReadAllText(savePath);
             SaveData loaded = JsonUtility.FromJson<SaveData>(jsonForLoad);
-            SlotManager.Instance.LoadQuickSlots(loaded);
             SaveSystem.Instance.Save();
         }
     }
@@ -296,22 +308,22 @@ public class Player : MonoBehaviour
 
         if(UpgradeItems[0].count >= 50)
         {
-            //pick_obj.GetComponent<SpriteRenderer>().sprite = pick_imgs[3];
+            Shop.instance.pickImage.sprite = pick_imgs[4];
+        }
+        else if(UpgradeItems[0].count >= 40)
+        {
             Shop.instance.pickImage.sprite = pick_imgs[3];
         }
-        else if(UpgradeItems[0].count >= 35)
+        else if(UpgradeItems[0].count >= 25)
         {
-            //pick_obj.GetComponent<SpriteRenderer>().sprite = pick_imgs[2];
             Shop.instance.pickImage.sprite = pick_imgs[2];
         }
         else if(UpgradeItems[0].count >= 15)
         {
-            //pick_obj.GetComponent<SpriteRenderer>().sprite = pick_imgs[1];
             Shop.instance.pickImage.sprite = pick_imgs[1];
         }
         else
         {
-            //pick_obj.GetComponent<SpriteRenderer>().sprite = pick_imgs[0];
             Shop.instance.pickImage.sprite = pick_imgs[0];
         }
 
@@ -361,7 +373,7 @@ public class Player : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.C))
                 {
-                    Inventory.AddItem(items[Random.Range(0, 20)], 1);
+                    Inventory.AddItem(items[UnityEngine.Random.Range(0, 20)], 1);
                 }
 
                 if (Input.GetKeyDown(KeyCode.V))
@@ -420,6 +432,8 @@ public class Player : MonoBehaviour
         LoadScene.instance.isAlreadyWatchStory = false;
         LevelManager.instance.remainingTime = LevelManager.instance.totalTime_1;
         LevelManager.instance.Restart_Go_Menu_Button();
+        UIController.Instance.SetObjectActive(0, false);    // 퀵슬롯 
+        UIController.Instance.SetObjectActive(1, false);    // 깊이
         Inventory_obj.SetActive(false);
         Inventory.badgePanel.SetActive(false);
         Inventory.moneyPanel.SetActive(false);
@@ -435,7 +449,7 @@ public class Player : MonoBehaviour
         Shop.createDrill_textobj.SetActive(true);
         Shop.upgradeDrill_textobj.SetActive(false);
         LoadScene.instance.stage_Level = 0;
-        SlotManager.Instance.quitSlotUI.ResetQuickSlot();
+        //SlotManager.Instance.quitSlotUI.ResetQuickSlot();
     }
 
     // 게임 일시정지 / 재개
@@ -447,7 +461,7 @@ public class Player : MonoBehaviour
         {
             //Time.timeScale = 0f; // 게임 일시정지
             PausePanel.SetActive(true); // UI 표시
-            player.input.Disable();
+            player.DisableControls();
             LevelManager.instance.isRunning = false;
             this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 0;
             this.gameObject.GetComponent<Rigidbody2D>().constraints |= RigidbodyConstraints2D.FreezePositionY;
@@ -456,7 +470,7 @@ public class Player : MonoBehaviour
         {
             //Time.timeScale = 1f; // 게임 재개
             PausePanel.SetActive(false); // UI 숨김
-            player.input.Enable();
+            player.EnableControls();
             LevelManager.instance.isRunning = true;
             this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
             this.gameObject.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePositionY;
@@ -490,10 +504,13 @@ public class Player : MonoBehaviour
         Invoke("InvokeGoMainMenu", 1.5f);
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[28]);
     }
+    
     void InvokeGoMainMenu()
     {
         SceneManager.LoadScene("Menu");
         LoadScene.instance.MainMenu.SetActive(true);
+        UIController.Instance.SetObjectActive(0, false);    // 퀵슬롯 
+        UIController.Instance.SetObjectActive(1, false);    // 깊이
         Inventory_obj.SetActive(false);
         Inventory.badgePanel.SetActive(false);
         Inventory.moneyPanel.SetActive(false);
@@ -501,8 +518,6 @@ public class Player : MonoBehaviour
         LevelManager.instance.stagetargetUI.SetActive(false);
         LevelManager.instance.guide_Button.SetActive(false);
         LevelManager.instance.pause_Button.SetActive(false);
-
-
     }
 
     // 인벤토리 상호작용
@@ -551,6 +566,7 @@ public class Player : MonoBehaviour
         // 상점 UI 이동 애니메이션
         if (isShopMoving && !isOnShop)
         {
+            player.DisableControl(1);
             currentTime += Time.deltaTime;
             float t = Mathf.Clamp01(currentTime / moveTime);
             shopUIPanel.transform.position = Vector3.Lerp(Shop_StartPos, Shop_EndPos, t);
@@ -563,6 +579,7 @@ public class Player : MonoBehaviour
         }
         else if (isShopMoving && isOnShop)
         {
+            player.EnableControl(1);
             currentTime += Time.deltaTime;
             float t = Mathf.Clamp01(currentTime / moveTime);
             shopUIPanel.transform.position = Vector3.Lerp(Shop_EndPos, Shop_StartPos, t);
@@ -606,7 +623,6 @@ public class Player : MonoBehaviour
         // 박물관 상호작용
         if (isNearMuseum && Input.GetKeyDown(KeyCode.F))
         {
-
             if (!isInMuseum && isActiveMuseum == false)
             {
                 isActiveMuseum = true;
@@ -699,11 +715,12 @@ public class Player : MonoBehaviour
 
         }
 
-        // 리셋 상호작용
+        // 리셋 상호용
         if(isNearReset && Input.GetKeyDown(KeyCode.F))
         {
             if(!isOnResetUI)
             {
+                player.DisableControl(1);
                 isOnResetUI = true;
                 ResetPanel.SetActive(true);
                 SavePanel.SetActive(true);
@@ -723,32 +740,31 @@ public class Player : MonoBehaviour
     // 지형 리셋 버튼
     public void Reset_Ground_Button()
     {
-        LoadScene.instance.GoMain();
-
+        LoadScene.instance.GoMain();        
         isOnResetUI = false;
         ResetPanel.SetActive(false);
-        SavePanel.SetActive(false);
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[35]);
         LevelManager.instance.isClickReset = true;
         SaveSystem.Instance.Save();
-
     }
+
     public void Reset_Close_Button()
     {
         isOnResetUI = false;
         ResetPanel.SetActive(false);
         SavePanel.SetActive(false);
+        player.EnableControl(1);
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[28]);
-
     }
 
+    // 세이브 버튼
     public void Save_Button()
     {
         SaveSystem.Instance.Save();
-        GroundAutoHeal();
+        hPBar.UpdateHP(100);
+        //GroundAutoHeal();
         Inventory.LogMessage("세이브 되었습니다");
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[34]);
-
     }
 
     // 박물관 입장/퇴장 페이드 인아웃
@@ -782,28 +798,37 @@ public class Player : MonoBehaviour
     }
 
     // 플레이어 체력 깎기
-    public void LostPlayerLife(int hp)
-    {
+    //public void LostPlayerLife(int hp)
+    //{
         
-        for (int i = li_PlayerHearts.Length-1; i >= 0; i--)
-        {
-            if (DicPlayerHeart[li_PlayerHearts[i].name] == true)
-            {
-                DicPlayerHeart[li_PlayerHearts[i].name] = false;
-                li_PlayerHearts[i].SetActive(false);
+    //    for (int i = li_PlayerHearts.Length-1; i >= 0; i--)
+    //    {
+    //        if (DicPlayerHeart[li_PlayerHearts[i].name] == true)
+    //        {
+    //            DicPlayerHeart[li_PlayerHearts[i].name] = false;
+    //            li_PlayerHearts[i].SetActive(false);
                 
-                if (DicPlayerHeart[li_PlayerHearts[0].name] == false)
-                {
-                    DiePanel.SetActive(true);
-                    isPaused = true;
-                    LevelManager.instance.isRunning = false;
-                    //Time.timeScale = 0f; // 게임 일시정지
-                    player.input.Disable();
-                }
-                break;
-            }
-        }
+    //            if (DicPlayerHeart[li_PlayerHearts[0].name] == false)
+    //            {
+    //                DiePanel.SetActive(true);
+    //                isPaused = true;
+    //                LevelManager.instance.isRunning = false;
+    //                //Time.timeScale = 0f; // 게임 일시정지
+    //                player.contorl.Disable();
+    //            }
+    //            break;
+    //        }
+    //    }
         
+    //}
+
+    public void GameOver()
+    {
+        hPBar.gameObject.SetActive(false);
+        DiePanel.SetActive(true);
+        isPaused = true;
+        LevelManager.instance.isRunning = false;
+        player.DisableControls();
     }
 
     // 리스폰 버튼
@@ -821,7 +846,6 @@ public class Player : MonoBehaviour
             isPaused = false;
             LevelManager.instance.isRunning = true;
             //Time.timeScale = 1f; // 게임 재개
-            player.input.Enable();
         }
         else
         {
@@ -831,11 +855,13 @@ public class Player : MonoBehaviour
 
     public void Restart_LastSave()
     {
+        SlotManager.Instance.quitSlotUI.ClearAllSlots();
         DiePanel.SetActive(false);
         isPaused = false;
         LevelManager.instance.isRunning = true;
+        //hPBar.UpdateHP(100);
         //Time.timeScale = 1f; // 게임 재개
-        AddPlayerLife(3);
+        //AddPlayerLife(3);
         
         if (!File.Exists(savePath))
         {
