@@ -152,7 +152,7 @@ public class Pickaxe : MonoBehaviour, IWeapon
             }
         }
         // 바위 블록
-        if(blockType == 3 || blockType == -1)
+        if(blockType == 3 || blockType == -1 || blockType == 12 || blockType == 13 || blockType == 14 || blockType == 15 || blockType == 16 || blockType ==17)
         {
             int idx = UnityEngine.Random.Range(9, 12);
             if(_isDigging && isDigSound == false)

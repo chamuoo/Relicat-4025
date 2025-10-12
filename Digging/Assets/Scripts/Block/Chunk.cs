@@ -12,8 +12,10 @@ public class Chunk : MonoBehaviour
     [SerializeField] int depth = 1;     //깊이값, 아직 활용 예정 없음
 
     [SerializeField] int boxCount = 1;       //생성할 랜덤박스 개수
+    public bool isResetBox = false; //생성할 랜덤박스가 리셋박스인지 여부
     [SerializeField] int jewelWithHardBlockCount = 2;//생성할 보석+단단한블럭 개수
     [SerializeField] int jewelCount = 8;    //생성할 보석 개수
+    [SerializeField] int hardJewelCount = 0;
     [SerializeField] int sandCount = 10; // 생성할 모래 개수
     [SerializeField] int relicBlockCount = 2;   //생성할 유물블럭 개수
     [SerializeField] int hardBlockCount = 7;    //생성할 단단한블럭 개수
@@ -80,7 +82,31 @@ public class Chunk : MonoBehaviour
         {
             boxCount = 2;       //생성할 랜덤박스 개수
             jewelWithHardBlockCount = 1;//생성할 보석+단단한블럭 개수
-            jewelCount = 10;    //생성할 보석 개수
+            if (stageNum == 1)//생성할 보석 개수를 스테이지에 따라 일반보석, 바위보석으로 나눔, 1스테이지는 제일 아래 else
+            {
+                jewelCount = 8;
+                hardJewelCount = 2;
+            }
+            else if (stageNum == 2)
+            {
+                jewelCount = 5;
+                hardJewelCount = 5;
+            }
+            else if (stageNum == 3)
+            {
+                jewelCount = 2;
+                hardJewelCount = 8;
+            }
+            else if (stageNum == 4)
+            {
+                jewelCount = 0;
+                hardJewelCount = 10;
+            }
+            else //1스테이지, stageNum == 0
+            {
+                jewelCount = 10;
+                hardJewelCount = 0;
+            }
             sandCount = 5; // 생성할 모래 개수
             relicBlockCount = 3;   //생성할 유물블럭 개수
             hardBlockCount = 7;    //생성할 단단한블럭 개수
@@ -93,7 +119,31 @@ public class Chunk : MonoBehaviour
         {
             boxCount = 1;       //생성할 랜덤박스 개수
             jewelWithHardBlockCount = 2;//생성할 보석+단단한블럭 개수
-            jewelCount = 8;    //생성할 보석 개수
+            if (stageNum == 1)//생성할 보석 개수를 스테이지에 따라 일반보석, 바위보석으로 나눔, 1스테이지는 제일 아래 else
+            {
+                jewelCount = 6;
+                hardJewelCount = 2;
+            }
+            else if (stageNum == 2)
+            {
+                jewelCount = 4;
+                hardJewelCount = 4;
+            }
+            else if (stageNum == 3)
+            {
+                jewelCount = 2;
+                hardJewelCount = 6;
+            }
+            else if (stageNum == 4)
+            {
+                jewelCount = 0;
+                hardJewelCount = 8;
+            }
+            else //1스테이지, stageNum == 0
+            {
+                jewelCount = 8;
+                hardJewelCount = 0;
+            }
             sandCount = 10; // 생성할 모래 개수
             relicBlockCount = 2;   //생성할 유물블럭 개수
             hardBlockCount = 7;    //생성할 단단한블럭 개수
@@ -106,7 +156,31 @@ public class Chunk : MonoBehaviour
         {
             boxCount = 1;       //생성할 랜덤박스 개수
             jewelWithHardBlockCount = 2;//생성할 보석+단단한블럭 개수
-            jewelCount = 5;    //생성할 보석 개수
+            if (stageNum == 1)//생성할 보석 개수를 스테이지에 따라 일반보석, 바위보석으로 나눔, 1스테이지는 제일 아래 else
+            {
+                jewelCount = 4;
+                hardJewelCount = 1;
+            }
+            else if (stageNum == 2)
+            {
+                jewelCount = 2;
+                hardJewelCount = 3;
+            }
+            else if (stageNum == 3)
+            {
+                jewelCount = 1;
+                hardJewelCount = 4;
+            }
+            else if (stageNum == 4)
+            {
+                jewelCount = 0;
+                hardJewelCount = 5;
+            }
+            else //1스테이지, stageNum == 0
+            {
+                jewelCount = 5;
+                hardJewelCount = 0;
+            }
             sandCount = 10; // 생성할 모래 개수
             relicBlockCount = 1;   //생성할 유물블럭 개수
             hardBlockCount = 7;    //생성할 단단한블럭 개수
@@ -146,8 +220,16 @@ public class Chunk : MonoBehaviour
             blockChangeCount++;
             if (blocks[numbers[i]].GetComponent<Block>().nowBlockType == 0)
             {
-                blocks[numbers[i]].GetComponent<Block>().nowBlockType = 1;
-                blocks[numbers[i]].GetComponent<Block>().ChangeBlock(1);
+                if(isResetBox)  //이 청크가 리셋박스 생성 청크인지 확인
+                {
+                    blocks[numbers[i]].GetComponent<Block>().nowBlockType = 18; //맞으면 리셋박스 생성
+                    blocks[numbers[i]].GetComponent<Block>().ChangeBlock(18);
+                }
+                else
+                {
+                    blocks[numbers[i]].GetComponent<Block>().nowBlockType = 1;  //아니면 취소
+                    blocks[numbers[i]].GetComponent<Block>().ChangeBlock(1);
+                }
                 Vector2 xPlus = (Vector2)blocks[numbers[i]].transform.position + new Vector2(1, 0);
                 Vector2 xMinus = (Vector2)blocks[numbers[i]].transform.position + new Vector2(-1, 0);
                 Vector2 yPlus = (Vector2)blocks[numbers[i]].transform.position + new Vector2(0, 1);
@@ -280,46 +362,173 @@ public class Chunk : MonoBehaviour
         {
             if (stageNum == 0)
             {
-                int persentage = Random.Range(1, 11);
-                if (persentage <= 5)
+                int persentage = Random.Range(1, 101);
+                if (persentage <= 30)
                 {
                     generateBlock(numbers, blockChangeCount, 1, 2);
                 }
-                else
+                else if (persentage <= 60)
                 {
                     generateBlock(numbers, blockChangeCount, 1, 7);
+                }
+                else if (persentage <= 76)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 8);
+                }
+                else if (persentage <= 92)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 9);
+                }
+                else if (persentage <= 96)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 10);
+                }
+                else
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 11);
                 }
             }
             else if(stageNum == 1)
             {
-                int persentage = Random.Range(1, 11);
-                if (persentage <= 3)
+                int persentage = Random.Range(1, 101);
+                if (persentage <= 40)
                 {
-                    generateBlock(numbers, blockChangeCount, 1, 2);
+                    generateBlock(numbers, blockChangeCount, 1, 8);
                 }
-                else if(persentage <= 6)
+                else if(persentage <= 80)
                 {
-                    generateBlock(numbers, blockChangeCount, 1, 7);
+                    generateBlock(numbers, blockChangeCount, 1, 9);
+                }
+                else if (persentage <= 90)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 10);
                 }
                 else
                 {
-                    generateBlock(numbers, blockChangeCount, 1, 8);
+                    generateBlock(numbers, blockChangeCount, 1, 11);
                 }
             }
             else if (stageNum == 2)
             {
-                int persentage = Random.Range(1, 11);
-                if (persentage <= 5)
-                {
-                    generateBlock(numbers, blockChangeCount, 1, 8);
-                }
-                else
+                int persentage = Random.Range(1, 101);
+                if (persentage <= 50)
                 {
                     generateBlock(numbers, blockChangeCount, 1, 9);
                 }
+                else if (persentage <= 75)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 10);
+                }
+                else
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 11);
+                }
+            }
+            else if (stageNum == 3)
+            {
+                int persentage = Random.Range(1, 101);
+                if (persentage <= 50)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 10);
+                }
+                else
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 11);
+                }
+            }
+            else // stageNum == 4
+            {
+                generateBlock(numbers, blockChangeCount, 1, 11);
             }
         }
         //보석 생성 끝
+
+        //바위광석 생성 시작
+
+        for (int i = 0; i < hardJewelCount; i++)
+        {
+            if (stageNum == 0)
+            {
+                int persentage = Random.Range(1, 101);
+                if (persentage <= 30)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 12);
+                }
+                else if (persentage <= 60)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 13);
+                }
+                else if (persentage <= 76)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 14);
+                }
+                else if (persentage <= 92)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 15);
+                }
+                else if (persentage <= 96)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 16);
+                }
+                else
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 17);
+                }
+            }
+            else if (stageNum == 1)
+            {
+                int persentage = Random.Range(1, 101);
+                if (persentage <= 40)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 14);
+                }
+                else if (persentage <= 80)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 15);
+                }
+                else if (persentage <= 90)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 16);
+                }
+                else
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 17);
+                }
+            }
+            else if (stageNum == 2)
+            {
+                int persentage = Random.Range(1, 101);
+                if (persentage <= 50)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 15);
+                }
+                else if (persentage <= 75)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 16);
+                }
+                else
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 17);
+                }
+            }
+            else if (stageNum == 3)
+            {
+                int persentage = Random.Range(1, 101);
+                if (persentage <= 50)
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 16);
+                }
+                else
+                {
+                    generateBlock(numbers, blockChangeCount, 1, 17);
+                }
+            }
+            else // stageNum == 4
+            {
+                generateBlock(numbers, blockChangeCount, 1, 17);
+            }
+        }
+        //바위광석 생성 끝
 
         //모래 생성 시작
         generateBlock(numbers, blockChangeCount, sandCount, 6);

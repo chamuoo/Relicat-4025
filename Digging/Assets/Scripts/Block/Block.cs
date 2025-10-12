@@ -69,6 +69,42 @@ public class Block : MonoBehaviour
     [SerializeField] Sprite block_Rock_3;
     [SerializeField] Sprite block_Rock_4;
 
+    [SerializeField] Sprite block_RockJewel_Coal_0;
+    [SerializeField] Sprite block_RockJewel_Coal_1;
+    [SerializeField] Sprite block_RockJewel_Coal_2;
+    [SerializeField] Sprite block_RockJewel_Coal_3;
+    [SerializeField] Sprite block_RockJewel_Coal_4;
+
+    [SerializeField] Sprite block_RockJewel_Copper_0;
+    [SerializeField] Sprite block_RockJewel_Copper_1;
+    [SerializeField] Sprite block_RockJewel_Copper_2;
+    [SerializeField] Sprite block_RockJewel_Copper_3;
+    [SerializeField] Sprite block_RockJewel_Copper_4;
+
+    [SerializeField] Sprite block_RockJewel_Iron_0;
+    [SerializeField] Sprite block_RockJewel_Iron_1;
+    [SerializeField] Sprite block_RockJewel_Iron_2;
+    [SerializeField] Sprite block_RockJewel_Iron_3;
+    [SerializeField] Sprite block_RockJewel_Iron_4;
+
+    [SerializeField] Sprite block_RockJewel_Gold_0;
+    [SerializeField] Sprite block_RockJewel_Gold_1;
+    [SerializeField] Sprite block_RockJewel_Gold_2;
+    [SerializeField] Sprite block_RockJewel_Gold_3;
+    [SerializeField] Sprite block_RockJewel_Gold_4;
+
+    [SerializeField] Sprite block_RockJewel_Ruby_0;
+    [SerializeField] Sprite block_RockJewel_Ruby_1;
+    [SerializeField] Sprite block_RockJewel_Ruby_2;
+    [SerializeField] Sprite block_RockJewel_Ruby_3;
+    [SerializeField] Sprite block_RockJewel_Ruby_4;
+
+    [SerializeField] Sprite block_RockJewel_Diamond_0;
+    [SerializeField] Sprite block_RockJewel_Diamond_1;
+    [SerializeField] Sprite block_RockJewel_Diamond_2;
+    [SerializeField] Sprite block_RockJewel_Diamond_3;
+    [SerializeField] Sprite block_RockJewel_Diamond_4;
+
     [SerializeField] Sprite block_Sand_0;
     [SerializeField] Sprite block_Sand_1;
     [SerializeField] Sprite block_Sand_2;
@@ -79,6 +115,9 @@ public class Block : MonoBehaviour
 
     [SerializeField] Sprite boxCloseSprite;
     [SerializeField] Sprite boxOpenSprite;
+    [SerializeField] Sprite resetBoxCloseSprite;
+    [SerializeField] Sprite resetBoxOpenSprite;
+
 
     [SerializeField] Sprite block_Poison_0;
     [SerializeField] Sprite block_Poison_1;
@@ -96,8 +135,6 @@ public class Block : MonoBehaviour
     public int blockType = 0; 
     public float blockHealth = 3;
     float blockMaxHealth = 3;
-
-    [SerializeField] int damage = 10;
 
     public bool isGroundSurface = false;
 
@@ -170,6 +207,7 @@ public class Block : MonoBehaviour
     public void ChangeBlock(int newBlockType)   //블럭 교체 명령
     {
         //-2는 세이브데이터에 안들어갈 무적블럭,-1은 무적블럭, 0은 normal, 1은 보물상자, 2는 석탄, 3은 단단한바위, 4는 유물, 5는 몬스터, 6은 모래, 7은 구리, 8은 철(은), 9는 금, 10은 루비, 11은 다이아
+        //12는 바위석탄, 13은 바위구리, 14는 바위철, 15는 바위금, 16은 바위루비, 17은 바위다이아, 18은 리셋보물상자
         //101은 가시블럭 102는 폭탄블럭 103은 독블럭
         //if (blockType != 0)
         //    Debug.Log(transform.position + " : 잘못된 호출");
@@ -278,6 +316,51 @@ public class Block : MonoBehaviour
                 blockHealth = 3;
                 blockMaxHealth = 3;
             }
+            else if (newBlockType == 12) //바위석탄
+            {
+                spriteRenderer.sprite = block_RockJewel_Coal_0;
+                blockHealth = 9;
+                blockMaxHealth = 9;
+            }
+            else if (newBlockType == 13) //바위구리
+            {
+                spriteRenderer.sprite = block_RockJewel_Copper_0;
+                blockHealth = 9;
+                blockMaxHealth = 9;
+            }
+            else if (newBlockType == 14) //바위철
+            {
+                spriteRenderer.sprite = block_RockJewel_Iron_0;
+                blockHealth = 9;
+                blockMaxHealth = 9;
+            }
+            else if (newBlockType == 15) //바위금
+            {
+                spriteRenderer.sprite = block_RockJewel_Gold_0;
+                blockHealth = 9;
+                blockMaxHealth = 9;
+            }
+            else if (newBlockType == 16) //바위루비
+            {
+                spriteRenderer.sprite = block_RockJewel_Ruby_0;
+                blockHealth = 9;
+                blockMaxHealth = 9;
+            }
+            else if (newBlockType == 17) //바위다이아
+            {
+                spriteRenderer.sprite = block_RockJewel_Diamond_0;
+                blockHealth = 9;
+                blockMaxHealth = 9;
+            }
+            else if (newBlockType == 18) //리셋보물상자
+            {
+                spriteRenderer.sprite = boxCloseSprite; //리셋박스 이미지를 받을시 아래 주석으로 대체 필요
+                //spriteRenderer.sprite = resetBoxCloseSprite;
+                if (originalBoxCollider != null)
+                {
+                    originalBoxCollider.isTrigger = true;
+                }
+            }
             else if (newBlockType == 101) //가시 블럭
             {
                 spriteRenderer.sprite = block_Poison_0; //가시 블럭 이미지 필요
@@ -359,6 +442,30 @@ public class Block : MonoBehaviour
                     {
                         spriteRenderer.sprite = block_Jewel_Diamond_1;
                     }
+                    else if (blockType == 12) //바위석탄
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Coal_1;
+                    }
+                    else if (blockType == 13) //바위구리
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Copper_1;
+                    }
+                    else if (blockType == 14) //바위철
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Iron_1;
+                    }
+                    else if (blockType == 15) //바위금
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Gold_1;
+                    }
+                    else if (blockType == 16) //루비
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Ruby_1;
+                    }
+                    else if (blockType == 17) //다이아
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Diamond_1;
+                    }
                     else if(blockType == 101) //가시블럭
                     {
                         spriteRenderer.sprite = block_Poison_1; //가시블럭 이미지 필요
@@ -409,6 +516,30 @@ public class Block : MonoBehaviour
                     else if (blockType == 11) //다이아
                     {
                         spriteRenderer.sprite = block_Jewel_Diamond_2;
+                    }
+                    else if (blockType == 12) //바위석탄
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Coal_2;
+                    }
+                    else if (blockType == 13) //바위구리
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Copper_2;
+                    }
+                    else if (blockType == 14) //바위철
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Iron_2;
+                    }
+                    else if (blockType == 15) //바위금
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Gold_2;
+                    }
+                    else if (blockType == 16) //바위루비
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Ruby_2;
+                    }
+                    else if (blockType == 17) //바위다이아
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Diamond_2;
                     }
                     else if (blockType == 101) //가시블럭
                     {
@@ -461,6 +592,30 @@ public class Block : MonoBehaviour
                     {
                         spriteRenderer.sprite = block_Jewel_Diamond_3;
                     }
+                    else if (blockType == 12) //바위석탄
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Coal_3;
+                    }
+                    else if (blockType == 13) //바위구리
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Copper_3;
+                    }
+                    else if (blockType == 14) //바위철
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Iron_3;
+                    }
+                    else if (blockType == 15) //바위금
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Gold_3;
+                    }
+                    else if (blockType == 16) //바위루비
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Ruby_3;
+                    }
+                    else if (blockType == 17) //바위다이아
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Diamond_3;
+                    }
                     else if (blockType == 101) //가시블럭
                     {
                         spriteRenderer.sprite = block_Poison_3; //가시블럭 이미지 필요
@@ -511,6 +666,30 @@ public class Block : MonoBehaviour
                     else if (blockType == 11) //다이아
                     {
                         spriteRenderer.sprite = block_Jewel_Diamond_4;
+                    }
+                    else if (blockType == 12) //바위석탄
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Coal_4;
+                    }
+                    else if (blockType == 13) //바위구리
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Copper_4;
+                    }
+                    else if (blockType == 14) //바위철
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Iron_4;
+                    }
+                    else if (blockType == 15) //바위금
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Gold_4;
+                    }
+                    else if (blockType == 16) //바위루비
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Ruby_4;
+                    }
+                    else if (blockType == 17) //바위다이아
+                    {
+                        spriteRenderer.sprite = block_RockJewel_Diamond_4;
                     }
                     else if (blockType == 101) //가시블럭
                     {
@@ -579,7 +758,6 @@ public class Block : MonoBehaviour
                 {
                     // 모래 부쉈을 때
                     SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[3]);
-
                 }
                 else if (blockType == 7)
                 {
@@ -609,6 +787,42 @@ public class Block : MonoBehaviour
                 {
                     //다이아 부쉈을 때
                     SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[1]);
+                    ItemDrop(1, 5, playerScript, 1);
+                }
+                else if (blockType == 12)
+                {
+                    //바위석탄 부쉈을 때
+                    SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[4]);
+                    ItemDrop(1, 0, playerScript, 1);
+                }
+                else if (blockType == 13)
+                {
+                    //바위구리 부쉈을 때
+                    SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[4]);
+                    ItemDrop(1, 1, playerScript, 1);
+                }
+                else if (blockType == 14)
+                {
+                    //바위철 부쉈을 때
+                    SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[4]);
+                    ItemDrop(1, 2, playerScript, 1);
+                }
+                else if (blockType == 15)
+                {
+                    //바위금 부쉈을 때
+                    SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[4]);
+                    ItemDrop(1, 3, playerScript, 1);
+                }
+                else if (blockType == 16)
+                {
+                    //바위루비 부쉈을 때
+                    SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[4]);
+                    ItemDrop(1, 4, playerScript, 1);
+                }
+                else if (blockType == 17)
+                {
+                    //바위다이아 부쉈을 때
+                    SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[4]);
                     ItemDrop(1, 5, playerScript, 1);
                 }
                 else if (blockType == 101) 
@@ -716,106 +930,117 @@ public class Block : MonoBehaviour
         }
 
         //보물상자에서 플레이어가 멀어졌는데도 canOpenBox가 true인 경우 해제
-        if (blockType == 1 && canOpenBox == true && Vector2.Distance(this.gameObject.transform.position, getPlayer.transform.position) > 2.5f) 
+        if ((blockType == 1 || blockType == 18) && canOpenBox == true && Vector2.Distance(this.gameObject.transform.position, getPlayer.transform.position) > 2.5f) 
         {
             canOpenBox = false;
         }
 
         //보물상자 근처에 플레이어가 있는 상태에서 F키(상호작용키)를 누를시 보물상자 해제
-        if (blockType == 1 && boxOpen == false && canOpenBox == true && Input.GetKeyDown(KeyCode.F))
+        if ((blockType == 1 || blockType == 18) && boxOpen == false && canOpenBox == true && Input.GetKeyDown(KeyCode.F))
         {
             SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[26]);
             
-                Player playerScript = getPlayer.GetComponent<Player>();
+            Player playerScript = getPlayer.GetComponent<Player>();
 
-            if(SceneManager.GetActiveScene().buildIndex == 2)
-            {
-                ItemDrop(2, 0, getPlayer.GetComponent<Player>(), 10);
-                ItemDrop(2, 1, getPlayer.GetComponent<Player>(), 10);
-            }
-            else if (SceneManager.GetActiveScene().buildIndex == 3 && LoadScene.instance.stage_Level == 0)
-            {
-                int randCoal = Random.Range(1, 11);
-                int randCopper = Random.Range(1, 11);
-
-                for (int i = 0; i < randCoal; i++)
-                {
-                    ItemDrop(1, 0, getPlayer.GetComponent<Player>(), 1);
-                }
-
-                for (int i = 0; i < randCopper; i++)
-                {
-                    ItemDrop(1, 1, playerScript.GetComponent<Player>(), 1);
-                }
-
-            }
-            else if (LoadScene.instance.stage_Level == 1)
-            {
-                int randCoal = Random.Range(1, 6);
-                int randCopper = Random.Range(1, 6);
-                int randIron = Random.Range(1, 6);
-
-                int randDrillcomponent = Random.Range(0, 3);
-
-                int randDrillBattery = Random.Range(0, 3);
-
-                for (int i = 0; i < randCoal; i++)
-                {
-                    ItemDrop(1, 0, getPlayer.GetComponent<Player>(), 1);
-                }
-
-                for (int i = 0; i < randCopper; i++)
-                {
-                    ItemDrop(1, 1, playerScript.GetComponent<Player>(), 1);
-                }
-                for (int i = 0; i < randIron; i++)
-                {
-                    ItemDrop(1, 2, playerScript.GetComponent<Player>(), 1);
-                }
-
-                for (int i = 0; i < randDrillcomponent; i++)
-                {
-                    int drillcomponent_num = Random.Range(1, 4);
-                    ItemDrop(3, drillcomponent_num, playerScript.GetComponent<Player>(), 1);
-                }
-                if (randDrillBattery > 1)
-                {
-                    ItemDrop(4, 4, playerScript.GetComponent<Player>(), 1);
-                }
-            }
-            else if (LoadScene.instance.stage_Level == 2)
+            if(blockType == 1)  //일반 박스인 경우
             {
 
-                int randIron = Random.Range(1, 6);
-                int randGold = Random.Range(1, 6);
-
-                int randDrillcomponent = Random.Range(0, 3);
-
-                int randDrillBattery = Random.Range(0, 3);
-
-                for (int i = 0; i < randIron; i++)
+                if (SceneManager.GetActiveScene().buildIndex == 2) //튜토리얼 스테이지 인듯
                 {
-                    ItemDrop(1, 2, playerScript.GetComponent<Player>(), 1);
+                    ItemDrop(2, 0, getPlayer.GetComponent<Player>(), 10);
+                    ItemDrop(2, 1, getPlayer.GetComponent<Player>(), 10);
                 }
-                for (int i = 0; i < randGold; i++)
+                else if (SceneManager.GetActiveScene().buildIndex == 3 && LoadScene.instance.stage_Level == 0)  //1스테이지
                 {
-                    ItemDrop(1, 3, playerScript.GetComponent<Player>(), 1);
+                    int randCoal = Random.Range(1, 11);
+                    int randCopper = Random.Range(1, 11);
+
+                    for (int i = 0; i < randCoal; i++)
+                    {
+                        ItemDrop(1, 0, getPlayer.GetComponent<Player>(), 1);
+                    }
+
+                    for (int i = 0; i < randCopper; i++)
+                    {
+                        ItemDrop(1, 1, playerScript.GetComponent<Player>(), 1);
+                    }
+
+                }
+                else if (LoadScene.instance.stage_Level == 1) //2스테이지
+                {
+                    int randCoal = Random.Range(1, 6);
+                    int randCopper = Random.Range(1, 6);
+                    int randIron = Random.Range(1, 6);
+
+                    int randDrillcomponent = Random.Range(0, 3);
+
+                    int randDrillBattery = Random.Range(0, 3);
+
+                    for (int i = 0; i < randCoal; i++)
+                    {
+                        ItemDrop(1, 0, getPlayer.GetComponent<Player>(), 1);
+                    }
+
+                    for (int i = 0; i < randCopper; i++)
+                    {
+                        ItemDrop(1, 1, playerScript.GetComponent<Player>(), 1);
+                    }
+                    for (int i = 0; i < randIron; i++)
+                    {
+                        ItemDrop(1, 2, playerScript.GetComponent<Player>(), 1);
+                    }
+
+                    for (int i = 0; i < randDrillcomponent; i++)
+                    {
+                        int drillcomponent_num = Random.Range(1, 4);
+                        ItemDrop(3, drillcomponent_num, playerScript.GetComponent<Player>(), 1);
+                    }
+                    if (randDrillBattery > 1)
+                    {
+                        ItemDrop(4, 4, playerScript.GetComponent<Player>(), 1);
+                    }
+                }
+                else if (LoadScene.instance.stage_Level == 2)   //3스테이지
+                {
+
+                    int randIron = Random.Range(1, 6);
+                    int randGold = Random.Range(1, 6);
+
+                    int randDrillcomponent = Random.Range(0, 3);
+
+                    int randDrillBattery = Random.Range(0, 3);
+
+                    for (int i = 0; i < randIron; i++)
+                    {
+                        ItemDrop(1, 2, playerScript.GetComponent<Player>(), 1);
+                    }
+                    for (int i = 0; i < randGold; i++)
+                    {
+                        ItemDrop(1, 3, playerScript.GetComponent<Player>(), 1);
+                    }
+
+                    for (int i = 0; i < randDrillcomponent; i++)
+                    {
+                        int drillcomponent_num = Random.Range(1, 4);
+                        ItemDrop(3, drillcomponent_num, playerScript.GetComponent<Player>(), 1);
+                    }
+
+                    if (randDrillBattery > 1)
+                    {
+                        ItemDrop(4, 4, playerScript.GetComponent<Player>(), 1);
+                    }
+
                 }
 
-                for (int i = 0; i < randDrillcomponent; i++)
-                {
-                    int drillcomponent_num = Random.Range(1, 4);
-                    ItemDrop(3, drillcomponent_num, playerScript.GetComponent<Player>(), 1);
-                }
-                
-                if(randDrillBattery > 1)
-                {
-                    ItemDrop(4, 4, playerScript.GetComponent<Player>(), 1);
-                }
-
+                spriteRenderer.sprite = boxOpenSprite;
+            }
+            else //리셋박스인 경우
+            {
+                ItemDrop(2, 5, playerScript.GetComponent<Player>(), 1);
+                spriteRenderer.sprite = boxOpenSprite;//리셋박스 이미지를 받을시 아래 주석으로 대체 필요
+                //spriteRenderer.sprite = resetBoxOpenSprite;
             }
 
-            spriteRenderer.sprite = boxOpenSprite;
             boxOpen = true;
         }
 
@@ -841,7 +1066,7 @@ public class Block : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (blockType == 1 && collision.tag == "Player") //보물상자 열 수 있음
+        if ((blockType == 1 || blockType == 18) && collision.tag == "Player") //보물상자 열 수 있음
         {
             getPlayer = collision.gameObject;
             canOpenBox = true;
@@ -851,13 +1076,13 @@ public class Block : MonoBehaviour
         {
             hitCooldown = 1;
             getPlayer = collision.gameObject;
-            getPlayer.GetComponent<PlayerController>().TakeDamage(damage, this.transform.position);
+            getPlayer.GetComponent<PlayerController>().TakeDamage(1, this.transform.position);
         }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (blockType == 1 && collision.tag == "Player")
+        if ((blockType == 1 || blockType == 18) && collision.tag == "Player")
         {
             getPlayer = collision.gameObject;
             canOpenBox = true;
@@ -867,13 +1092,13 @@ public class Block : MonoBehaviour
         {
             hitCooldown = 1;
             getPlayer = collision.gameObject;
-            getPlayer.GetComponent<PlayerController>().TakeDamage(damage, this.transform.position);
+            getPlayer.GetComponent<PlayerController>().TakeDamage(1, this.transform.position);
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (blockType == 1 && collision.tag == "Player")
+        if ((blockType == 1 || blockType == 18) && collision.tag == "Player")
         {
             getPlayer = collision.gameObject;
             canOpenBox = false;
@@ -883,7 +1108,7 @@ public class Block : MonoBehaviour
         {
             hitCooldown = 1;
             getPlayer = collision.gameObject;
-            getPlayer.GetComponent<PlayerController>().TakeDamage(damage, this.transform.position);
+            getPlayer.GetComponent<PlayerController>().TakeDamage(1, this.transform.position);
         }
     }
 }
