@@ -18,6 +18,7 @@ TagManager:
   - tutorialExit
   - MainCanvas
   - Floor
+  - Lamp
   layers:
   - Default
   - TransparentFX
@@ -38,7 +39,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Floor
   - Bomb
   - 
   - 

@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System;
 using Spine;
+using UnityEngine.SceneManagement;
 
 public class Inventory : MonoBehaviour
 {
@@ -80,7 +81,7 @@ public class Inventory : MonoBehaviour
     public void FreshSlot()
     {
         int i = 0;
-        for (; i < items.Count && i < slots.Length; i++)
+        for(; i < items.Count && i < slots.Length; i++)
         {
             slots[i].item = items[i];
 
@@ -90,7 +91,7 @@ public class Inventory : MonoBehaviour
             text.text = items[i].count.ToString();
         }
 
-        for (; i < slots.Length; i++)
+        for(; i < slots.Length; i++)
         {
             slots[i].item = null;
 
@@ -124,7 +125,6 @@ public class Inventory : MonoBehaviour
                         TextMeshProUGUI text = parent.GetComponentInChildren<TextMeshProUGUI>();
                         Debug.Log(text);
                         text.text = item.count.ToString();
-
                         ItemLog(_item, addEA);
                     }
                 }
@@ -149,7 +149,6 @@ public class Inventory : MonoBehaviour
                     TextMeshProUGUI text = parent.GetComponentInChildren<TextMeshProUGUI>();
                     Debug.Log(text);
                     text.text = _item.count.ToString();
-
                     ItemLog(_item, addEA);
                 }
             }

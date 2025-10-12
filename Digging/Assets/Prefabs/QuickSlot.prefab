@@ -208,22 +208,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e11869af95d76d546a066c7d68086050, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _index: 0
-  _typeS: 0
-  _typeI: 0
-  _typeW: 0
-  _instanceW:
-    _template: {fileID: 0}
-    _id: 
-    _damage: 0
-    _level: 0
-    _energy: 0
-    _range: {x: 0, y: 0}
-    itemImage: {fileID: 0}
-  _instanceI:
-    _item: {fileID: 0}
-    _count: 0
-    itemImage: {fileID: 0}
+  _index: 1
+  _typeS: 1
+  _type: 32
+  background: {fileID: 3151481091445681323}
+  action: {fileID: 7057168073657445141}
 --- !u!1 &1558061348855014753
 GameObject:
   m_ObjectHideFlags: 0
@@ -316,7 +305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c98d3be9a1f3e6c4d9e3501e94df74ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  img: {fileID: 0}
+  img: {fileID: 7415554007139016251}
 --- !u!1 &1711583276714510806
 GameObject:
   m_ObjectHideFlags: 0
@@ -409,7 +398,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c98d3be9a1f3e6c4d9e3501e94df74ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  img: {fileID: 0}
+  img: {fileID: 8765357340283261668}
 --- !u!1 &2013638534727153793
 GameObject:
   m_ObjectHideFlags: 0
@@ -595,7 +584,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c98d3be9a1f3e6c4d9e3501e94df74ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  img: {fileID: 0}
+  img: {fileID: 5772459298740331113}
 --- !u!1 &3203178544344390248
 GameObject:
   m_ObjectHideFlags: 0
@@ -823,7 +812,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28e98b61770a4dc4bbae5d458bd7cad3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slotInfos: []
 --- !u!1 &3396811018776182444
 GameObject:
   m_ObjectHideFlags: 0
@@ -940,21 +928,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _index: 0
-  _typeS: 0
-  _typeI: 0
-  _typeW: 0
-  _instanceW:
-    _template: {fileID: 0}
-    _id: 
-    _damage: 0
-    _level: 0
-    _energy: 0
-    _range: {x: 0, y: 0}
-    itemImage: {fileID: 0}
-  _instanceI:
-    _item: {fileID: 0}
-    _count: 0
-    itemImage: {fileID: 0}
+  _typeS: 1
+  _type: 16
+  background: {fileID: 697176992625787755}
+  action: {fileID: 5208867533326777774}
 --- !u!1 &4086341927839891539
 GameObject:
   m_ObjectHideFlags: 0
@@ -1070,22 +1047,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e11869af95d76d546a066c7d68086050, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _index: 0
-  _typeS: 0
-  _typeI: 0
-  _typeW: 0
-  _instanceW:
-    _template: {fileID: 0}
-    _id: 
-    _damage: 0
-    _level: 0
-    _energy: 0
-    _range: {x: 0, y: 0}
-    itemImage: {fileID: 0}
-  _instanceI:
-    _item: {fileID: 0}
-    _count: 0
-    itemImage: {fileID: 0}
+  _index: 3
+  _typeS: 1
+  _type: 34
+  background: {fileID: 827588017304241062}
+  action: {fileID: 701518592503241670}
 --- !u!1 &4271244674948597548
 GameObject:
   m_ObjectHideFlags: 0
@@ -1178,7 +1144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c98d3be9a1f3e6c4d9e3501e94df74ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  img: {fileID: 0}
+  img: {fileID: 5984969588644066200}
 --- !u!1 &4389120225541073536
 GameObject:
   m_ObjectHideFlags: 0
@@ -1294,22 +1260,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e11869af95d76d546a066c7d68086050, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _index: 0
-  _typeS: 0
-  _typeI: 0
-  _typeW: 0
-  _instanceW:
-    _template: {fileID: 0}
-    _id: 
-    _damage: 0
-    _level: 0
-    _energy: 0
-    _range: {x: 0, y: 0}
-    itemImage: {fileID: 0}
-  _instanceI:
-    _item: {fileID: 0}
-    _count: 0
-    itemImage: {fileID: 0}
+  _index: 2
+  _typeS: 1
+  _type: 33
+  background: {fileID: 1903023834920010300}
+  action: {fileID: 5677888477267187301}
 --- !u!1 &4789538406181945166
 GameObject:
   m_ObjectHideFlags: 0
@@ -2231,22 +2186,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e11869af95d76d546a066c7d68086050, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _index: 0
-  _typeS: 0
-  _typeI: 0
-  _typeW: 0
-  _instanceW:
-    _template: {fileID: 0}
-    _id: 
-    _damage: 0
-    _level: 0
-    _energy: 0
-    _range: {x: 0, y: 0}
-    itemImage: {fileID: 0}
-  _instanceI:
-    _item: {fileID: 0}
-    _count: 0
-    itemImage: {fileID: 0}
+  _index: 4
+  _typeS: 1
+  _type: 17
+  background: {fileID: 5576976515978104556}
+  action: {fileID: 7789856385576050225}
 --- !u!1 &6307103500706154234
 GameObject:
   m_ObjectHideFlags: 0
@@ -2633,7 +2577,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c98d3be9a1f3e6c4d9e3501e94df74ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  img: {fileID: 0}
+  img: {fileID: 2387363348930909166}
 --- !u!1 &7896945009461496012
 GameObject:
   m_ObjectHideFlags: 0

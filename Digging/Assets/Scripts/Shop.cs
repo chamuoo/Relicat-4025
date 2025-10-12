@@ -1,3 +1,4 @@
+using Spine;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -26,7 +27,7 @@ public class Shop : MonoBehaviour
 
     public GameObject playerlight;
 
-    public float pick_damage = 6f;
+    public float pick_damage;
     public float lightRadius;
 
 
@@ -50,7 +51,6 @@ public class Shop : MonoBehaviour
             Destroy(this.gameObject); // 중복 방지
         }
 
-        lightRadius = playerlight.GetComponent<Light2D>().pointLightOuterRadius;
 
     }
 
@@ -77,14 +77,12 @@ public class Shop : MonoBehaviour
         player = FindObjectOfType<Player>();
         playerController = FindObjectOfType<PlayerController>();
         playerlight = GameObject.Find("Spot Light 2D");
+        lightRadius = playerlight?.GetComponent<Light2D>()?.pointLightOuterRadius ?? 0f;
         //Debug.Log(playerlight.gameObject.name);
-
-
 
         if(player != null)
         {
             Debug.Log("씬 전환 후 Player 연결 완료: " + player.name);
-            playerController.pickdamage = pick_damage;
             playerlight.GetComponent<Light2D>().pointLightOuterRadius = lightRadius;
         }
         else
@@ -184,16 +182,7 @@ public class Shop : MonoBehaviour
             Inventory.AddItem(player.UseItems[0], 1);
 
             // 해당 타입에 맞는 슬롯 찾기
-            SlotInfo slot = SlotManager.Instance.FindSlot(player.UseItems[0].type);
-
-            if(slot != null && slot._instanceI != null)    // 이미 퀵슬롯에 아이템이 있음.
-            {
-                SlotManager.Instance.UpdateText(slot);
-            }
-            else
-            {
-                SlotManager.Instance.FillSlot(player.UseItems[0], 1);
-            }
+            SlotManager.Instance.InvenFillSlot();
 
             SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[33]);
 
@@ -212,17 +201,8 @@ public class Shop : MonoBehaviour
             Inventory.AddItem(player.UseItems[1], 1);
 
             // 해당 타입에 맞는 슬롯 찾기
-            SlotInfo slot = SlotManager.Instance.FindSlot(player.UseItems[1].type);
+            SlotManager.Instance.InvenFillSlot();
 
-            if(slot != null && slot._instanceI != null)    // 이미 퀵슬롯에 아이템이 있음.
-            {
-                SlotManager.Instance.UpdateText(slot);
-            }
-            else
-            {
-                SlotManager.Instance.FillSlot(player.UseItems[1], 1);
-            }
-            
             SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[33]);
         }
         else
@@ -239,16 +219,7 @@ public class Shop : MonoBehaviour
             Inventory.AddItem(player.UseItems[2], 1);
 
             // 해당 타입에 맞는 슬롯 찾기
-            SlotInfo slot = SlotManager.Instance.FindSlot(player.UseItems[2].type);
-
-            if(slot != null && slot._instanceI != null)    // 이미 퀵슬롯에 아이템이 있음.
-            {
-                SlotManager.Instance.UpdateText(slot);
-            }
-            else
-            {
-                SlotManager.Instance.FillSlot(player.UseItems[2], 1);
-            }
+            SlotManager.Instance.InvenFillSlot();
 
             SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[33]);
 
@@ -267,16 +238,15 @@ public class Shop : MonoBehaviour
         {            
             Inventory.money_item.count -= player.UpgradeItems[0].value;
 
-            // 이미지 삽입
-            if(SlotManager.Instance.currentWeapon._instanceW._template.type == WeaponType.Pickaxe)
-            {
-                SlotManager.Instance.currentWeapon._instanceW._damage = pick_damage;
-                SlotManager.Instance.UpgradeWeapon(SlotManager.Instance.currentWeapon);
-            }
+            SlotInfo slot = SlotManager.Instance.quitSlotUI.FindSlot(ItemTypes.Pickaxe);
 
-            // 데미지 증가
-            pick_damage += 0.4f;
-            playerController.pickdamage = pick_damage;
+            // 이미지 삽입
+            if(slot.slot.weapon != null)
+            {
+                slot.slot.weapon._damage += 0.4f;
+                float newDamage = slot.slot.weapon._damage;
+                SlotManager.Instance.UpgradeWeapon(slot, newDamage);
+            }
 
             player.UpgradeItems[0].count++;
             shop_pickLvText.text = "레벨 : " + player.UpgradeItems[0].count;
@@ -333,10 +303,8 @@ public class Shop : MonoBehaviour
             isCreateDrill = true;
 
             // 드릴 생성
-            if(SlotManager.Instance.IsEquipWeapon(WeaponType.Drill) == false)
-                SlotManager.Instance.FillSlot(player.UseItems[3], player.Weapons[1], 1);    // 아이템 추가
-            else
-                print("이미 드릴이 있습니다");
+            SlotInfo slot = SlotManager.Instance.quitSlotUI.FindSlot(ItemTypes.Drill);
+            SlotManager.Instance.GiveItem(ItemTypes.Drill, 1);
 
             createDrill_textobj.SetActive(false);
             upgradeDrill_textobj.SetActive(true);
@@ -366,8 +334,13 @@ public class Shop : MonoBehaviour
             player.Drill_Items[3].count -= 1;
 
             // 기능 업그레이드
-
-            // 
+            SlotInfo slot = SlotManager.Instance.quitSlotUI.FindSlot(ItemTypes.Drill);
+            if(slot.slot != null && slot.slot.weapon != null) // 이미 퀵슬롯에 아이템이 있음.
+            {
+                //slot.slot.weapon._damage += 0.4f;
+                //float newDamage = slot.Slot.weapon._damage;
+                //SlotManager.Instance.UpgradeWeapon(slot, newDamage);
+            }
 
             player.Drill_Items[0].count++;
             drill_Lv_Text.text = "레벨 : " + player.Drill_Items[0].count;

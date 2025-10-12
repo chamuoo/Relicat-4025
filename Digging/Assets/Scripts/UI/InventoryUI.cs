@@ -15,26 +15,25 @@ public class InventoryUI : MonoBehaviour
     private ItemInstance instanceI;
 
     [SerializeField] private List<SlotInfo> slotInfos;
-    public IReadOnlyList<SlotInfo> InventorySlots => slotInfos;
 
     #endregion Field
 
     // 인벤토리 데이터 채우기
     public void InitFillData()
     {
-        slotInfos = GetComponentsInChildren<SlotInfo>(true).ToList();
+        //slotInfos = GetComponentsInChildren<SlotInfo>(true).ToList();
 
-        for(int i = 0; i < slotInfos.Count; i++)
-        {
-            slotInfos[i].Initialize(SlotType.Inventory, i); // 슬롯 타입과 슬롯 순서 넣기
+        //for(int i = 0; i < slotInfos.Count; i++)
+        //{
+        //    slotInfos[i].Initialize(SlotType.Inventory, i); // 슬롯 타입과 슬롯 순서 넣기
 
-            var item = slotInfos[i].GetComponentInChildren<SlotInteraction>();
-            // 좌클릭: 선택
-            item.onLeftClick = SlotManager.Instance.SetSelectedSlot;
+        //    var item = slotInfos[i].GetComponentInChildren<SlotInteraction>();
+        //    // 좌클릭: 선택
+        //    item.onLeftClick = SlotManager.Instance.SetSelectedSlot;
 
-            // 우클릭: 제거
-            item.onRightClick = SlotManager.Instance.RemoveInstance;
-        }
+        //    // 우클릭: 제거
+        //    item.onRightClick = SlotManager.Instance.RemoveInstance;
+        //}
     }
 
     // 인벤토리 초기화

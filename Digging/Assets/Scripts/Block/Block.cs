@@ -97,6 +97,8 @@ public class Block : MonoBehaviour
     public float blockHealth = 3;
     float blockMaxHealth = 3;
 
+    [SerializeField] int damage = 10;
+
     public bool isGroundSurface = false;
 
     public int stageNum = 0;
@@ -849,7 +851,7 @@ public class Block : MonoBehaviour
         {
             hitCooldown = 1;
             getPlayer = collision.gameObject;
-            getPlayer.GetComponent<PlayerController>().TakeDamage(1, this.transform);
+            getPlayer.GetComponent<PlayerController>().TakeDamage(damage, this.transform.position);
         }
     }
 
@@ -865,7 +867,7 @@ public class Block : MonoBehaviour
         {
             hitCooldown = 1;
             getPlayer = collision.gameObject;
-            getPlayer.GetComponent<PlayerController>().TakeDamage(1, this.transform);
+            getPlayer.GetComponent<PlayerController>().TakeDamage(damage, this.transform.position);
         }
     }
 
@@ -881,7 +883,7 @@ public class Block : MonoBehaviour
         {
             hitCooldown = 1;
             getPlayer = collision.gameObject;
-            getPlayer.GetComponent<PlayerController>().TakeDamage(1, this.transform);
+            getPlayer.GetComponent<PlayerController>().TakeDamage(damage, this.transform.position);
         }
     }
 }

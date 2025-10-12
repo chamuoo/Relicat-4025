@@ -1,14 +1,17 @@
+using System;
 using System.Collections.Generic;
-using Unity.Burst.CompilerServices;
+using System.Data;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
+using static PlayerController;
 
-public class Pickaxe : MonoBehaviour
+public class Pickaxe : MonoBehaviour, IWeapon
 {
     [SerializeField] private AudioSource diggingAudioSource;
 
-    private bool isDigging = false;
+    private bool _isDigging = false;
+    public bool isDigging { get => _isDigging; set => _isDigging = value; }
     private bool isDigSound = false;
 
     private float t;
@@ -16,16 +19,17 @@ public class Pickaxe : MonoBehaviour
 
     private Vector3 pivot;
 
-    public WeaponInstance _instance;
-
-    public int speed;
-
-    public float damage;
-    [SerializeField] float range = 1;
-
+    [SerializeField] WeaponInstance _instance;
     Vector2 tileSize;
 
-    public void Setup(WeaponInstance instance)
+    public WeaponInstance Instance => _instance;
+
+    public void Use(Vector2 mousePos, Player player, PlayerState state)
+    {
+        Digging(mousePos, player, state);
+    }
+
+    public void SetInstance(WeaponInstance instance)
     {
         _instance = instance;
     }
@@ -38,70 +42,88 @@ public class Pickaxe : MonoBehaviour
     private void Start()
     {
         tileSize = new (1, 1);
-        damage = _instance._damage;
     }
 
-    public void Digging(Vector2 worldMousePos, Player player, bool isSanded)
+    private void Digging(Vector2 worldMousePos, Player player, PlayerState state)
     {
-        RaycastHit2D hit = Physics2D.Raycast(worldMousePos, Vector2.zero, 0f, LayerMask.GetMask("Block"));
-        if(hit.collider == null)
-            return;
+        // 1. 블록 가져오기 및 사운드 재생 블럭
+        List<GameObject> blocks = GetBlocksToDig(worldMousePos, player, state);
+        HashSet<int> playedBlockTypes = new();
 
-        var blocksDict = hit.collider.GetComponent<Block>().blocksDictionary;
-        if(blocksDict == null)
-            return;
-
-        // 블럭 가져오기
-        List<GameObject> blocks;
-
-        if(isSanded)
-        {
-            // 모래에 갇혔으면 자신의 위치에 있는 블럭만 반환
-            GameObject sandBlock = GetCurrentPlayerBlock(player.GetComponent<PlayerController>());
-            blocks = new List<GameObject>();
-            if(sandBlock != null) blocks.Add(sandBlock);
-        }
-        else
-        {
-            // 정상적으로 주변 블럭 반환
-            //blocks = GetVaildBlocksUnderMouse(hit);
-            blocks = ToGrid(hit, blocksDict);
-        }
-
+        // 2. 블록이 없으면 digging 종료
         if(blocks == null || blocks.Count == 0)
         {
-            isDigging = false;
+            _isDigging = false;
             t = 0;
             return;
         }
 
-        isDigging = true;
+        // 3. 블록이 존재하면 digging 시작
+        _isDigging = true;
 
-        // 찾을 블럭의 개수만큼 블럭 파괴
+        // 4. 블록 파괴 및 사운드
+
         foreach(GameObject blockObj in blocks)
         {
             if(blockObj.TryGetComponent(out Block block))
             {
                 block.BlockDestroy(_instance._damage * Time.deltaTime, player);
-                PlayDigSound(block.blockType);
+
+                if(!playedBlockTypes.Contains(block.blockType))
+                {
+                    PlayDigSound(block.blockType);  // 다른 타입이면 재생
+                    playedBlockTypes.Add(block.blockType); // 타입 기록
+                }
+
+                //Debug.Log($"블록 타입: {block.blockType}, 사운드 재생 여부: {!playedBlockTypes.Contains(block.blockType)}");
             }
         }
+    }
 
+    private void Update()
+    {
         AnimatePickaxe();
+    }
+
+    // 블럭 가져오기
+    private List<GameObject> GetBlocksToDig(Vector2 worldMousePos, Player player, PlayerState state)
+    {
+        // 블럭 가져오기
+        List<GameObject> blocks = new List<GameObject>();
+
+        if(state == PlayerState.BURIED)
+        {
+            // 모래에 갇혔으면 자신의 위치에 있는 블럭만 반환
+            GameObject sandBlock = GetCurrentPlayerBlock(player.GetComponent<PlayerController>());
+
+            if(sandBlock != null && !blocks.Contains(sandBlock))
+                blocks.Add(sandBlock);
+        }
+        else
+        {
+            RaycastHit2D hit = Physics2D.Raycast(worldMousePos, Vector2.zero, 0f, LayerMask.GetMask("Block"));
+            if(hit.collider == null)
+                return null;
+
+            var blocksDict = hit.collider.GetComponent<Block>().blocksDictionary;
+            blocks = ToGrid(hit, blocksDict);
+        }
+
+        return blocks;
     }
 
     private void PlayDigSound(int blockType)
     {
-        //// Dig 사운드
+        // Dig 사운드
         if(blockType == 0 || blockType == 4 || blockType == 5 || blockType == 101 || blockType == 102)
         {
             int idx = UnityEngine.Random.Range(5, 9);
-            if(isDigging && isDigSound == false)
+            if(_isDigging && isDigSound == false)
             {
                 diggingAudioSource.PlayOneShot(SoundManager.Instance.SFXSounds[idx]);
                 isDigSound = true;
             }
-            if(!isDigging && diggingAudioSource.isPlaying == true)
+            if(!_isDigging && diggingAudioSource.isPlaying == true)
             {
                 diggingAudioSource.Stop();
                 isDigSound = false;
@@ -111,16 +133,15 @@ public class Pickaxe : MonoBehaviour
                 isDigSound = false;
             }
         }
-
         // 광물 블록
         if(blockType == 2 || blockType == 7 || blockType == 8 || blockType == 9 || blockType == 10 || blockType == 11)
         {
-            if(isDigging && isDigSound == false)
+            if(_isDigging && isDigSound == false)
             {
                 diggingAudioSource.PlayOneShot(SoundManager.Instance.SFXSounds[12]);
                 isDigSound = true;
             }
-            if(!isDigging && diggingAudioSource.isPlaying == true)
+            if(!_isDigging && diggingAudioSource.isPlaying == true)
             {
                 diggingAudioSource.Stop();
                 isDigSound = false;
@@ -134,12 +155,12 @@ public class Pickaxe : MonoBehaviour
         if(blockType == 3 || blockType == -1)
         {
             int idx = UnityEngine.Random.Range(9, 12);
-            if(isDigging && isDigSound == false)
+            if(_isDigging && isDigSound == false)
             {
                 diggingAudioSource.PlayOneShot(SoundManager.Instance.SFXSounds[idx]);
                 isDigSound = true;
             }
-            if(!isDigging && diggingAudioSource.isPlaying == true)
+            if(!_isDigging && diggingAudioSource.isPlaying == true)
             {
                 diggingAudioSource.Stop();
                 isDigSound = false;
@@ -153,12 +174,12 @@ public class Pickaxe : MonoBehaviour
         if(blockType == 6)
         {
 
-            if(isDigging && isDigSound == false)
+            if(_isDigging && isDigSound == false)
             {
                 diggingAudioSource.PlayOneShot(SoundManager.Instance.SFXSounds[8]);
                 isDigSound = true;
             }
-            if(!isDigging && diggingAudioSource.isPlaying == true)
+            if(!_isDigging && diggingAudioSource.isPlaying == true)
             {
                 diggingAudioSource.Stop();
                 isDigSound = false;
@@ -174,160 +195,27 @@ public class Pickaxe : MonoBehaviour
     {
         pivot = transform.parent.Find("Pivot").position;
 
-        t += Time.fixedDeltaTime * (_instance._damage);
-        t = Mathf.Clamp01(t);
+        if(isDigging)
+        {
+            t += Time.deltaTime * (_instance._damage / 2);
+            t = Mathf.Clamp01(t);
 
-        angle = Mathf.Lerp(60, -30, t);
-        float rad = angle * Mathf.Deg2Rad;
+            angle = Mathf.Lerp(60, -30, t);
+            float rad = angle * Mathf.Deg2Rad;
 
-        Vector3 offset = new Vector3(Mathf.Cos(rad), Mathf.Sin(rad), 0f) * 0.1f;
+            Vector3 offset = new Vector3(Mathf.Cos(rad), Mathf.Sin(rad), 0f) * 0.1f;
+            transform.position = pivot + offset;
+            transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-        if(t >= 1)
+            if(t >= 1)
+                t = 0;
+        }
+        else
         {
             t = 0;
             transform.position = pivot;
             transform.rotation = Quaternion.Euler(0f, 0f, -30f);
         }
-
-        transform.position = pivot + offset;
-        transform.rotation = Quaternion.Euler(0f, 0f, angle);
-    }
-
-    // 마우스 위치 기준으로 파괴 가능한 블록 반환
-    public List<GameObject> GetVaildBlocksUnderMouse(RaycastHit2D hit)
-    {
-        if(hit.collider == null || !hit.collider.CompareTag("Block"))
-            return null;
-
-        Vector2 playerPos = transform.root.position;
-        Vector2 clickBlockPos = hit.point;
-
-        var blocksDict = hit.collider.GetComponent<Block>().blocksDictionary;
-
-        return CanDigBlocks(playerPos, clickBlockPos, blocksDict, _instance._range);
-    }
-
-    public List<GameObject> CanDigBlocks(Vector2 playerPos, Vector2 blockPos, BlocksDictionary blocksDict, Vector2 range)
-    {
-        List<GameObject> diggableBlocks = new();
-
-        // 블럭과 플레이어(position)
-        Vector2 origin = GetCenteredPosition(blockPos);
-        Vector2 playerCenter = GetCenteredPosition(playerPos);
-
-        // 방향 계산(step, 대각선 여부 포함)
-        Vector2 direction = GetDirection(playerCenter, origin, out Vector2 step, out bool isDiagonal);
-        if(direction == Vector2.zero)
-            return diggableBlocks;
-
-        // 거리 확인(range)
-        if(!IsOneStepAway(playerCenter, origin, step))
-            return diggableBlocks;
-
-        // 대각선 방향 처리
-        if(isDiagonal)
-        {
-            if(CanDigDiagonal(origin, direction, blocksDict))
-                TryAddBlock(origin, blocksDict, diggableBlocks);
-
-            return diggableBlocks;
-        }
-
-        // 직선 방향 처리(range만큼 반복)
-        AddBlocksInLine(origin, step, direction, range, blocksDict, diggableBlocks);
-        return diggableBlocks;
-    }
-
-    // 좌표 보정
-    private Vector2 GetCenteredPosition(Vector2 pos)
-    {
-        return new Vector2(Mathf.Floor(pos.x) + 0.5f, Mathf.Floor(pos.y) + 0.5f);
-    }
-
-    // 방향 가져오기, step, 대각선 여부를 반환
-    private Vector2 GetDirection(Vector2 from, Vector2 to, out Vector2 step, out bool isDiagonal)
-    {
-        Vector2 dir = (to - from).normalized;
-        if(dir == Vector2.zero)
-            dir = new Vector2(Mathf.Sign(from.x), 0f); // fallback
-
-        Vector2 simplified = GetSimplifiedDirection(dir);
-        isDiagonal = Mathf.Abs(simplified.x) > 0 && Mathf.Abs(simplified.y) > 0;
-
-        step = simplified;
-        return simplified;
-    }
-
-    // 블럭이 range만큼 떨어져 있는지 확인
-    private bool IsOneStepAway(Vector2 from, Vector2 to, Vector2 step)
-    {
-        float epsilon = 0.01f;
-        return Mathf.Abs((to - from).magnitude - step.magnitude) <= epsilon;
-    }
-
-    // 해당 위치의 블럭을 리스트에 추가
-    private void TryAddBlock(Vector2 pos, BlocksDictionary dict, List<GameObject> list)
-    {
-        Vector2 key = GetCenteredPosition(pos);
-        if(dict.blockPosition.TryGetValue(key, out GameObject block))
-            list.Add(block);
-    }
-
-    // 직선 방향을 기준으로 range만큼 블럭 추가
-    private void AddBlocksInLine(Vector2 start, Vector2 step, Vector2 dir, Vector2 range, BlocksDictionary dict, List<GameObject> list)
-    {
-        int repeat = dir.x != 0 ? Mathf.FloorToInt(range.x) : Mathf.FloorToInt(range.y);
-        Vector2 current = start;
-
-        for(int i = 0; i < repeat; i++)
-        {
-            TryAddBlock(current, dict, list);
-            current += step;
-        }
-    }
-
-    // 대각선 블럭을 캘 수 있는 조건 검사
-    private bool CanDigDiagonal(Vector2 origin, Vector2 direction, BlocksDictionary dict)
-    {
-        Vector2[] checkDirs = direction switch
-        {
-            var d when d == new Vector2(1, 1) => new[] { new Vector2(-1f, 0f), new Vector2(0f, -1f) },
-            var d when d == new Vector2(-1, 1) => new[] { new Vector2(1f, 0f), new Vector2(0f, -1f) },
-            var d when d == new Vector2(-1, -1) => new[] { new Vector2(1f, 0f), new Vector2(0f, 1f) },
-            var d when d == new Vector2(1, -1) => new[] { new Vector2(-1f, 0f), new Vector2(0f, 1f) },
-            _ => new Vector2[0]
-        };
-
-        foreach(var check in checkDirs)
-        {
-            Vector2 neighbor = origin + check;
-            Vector2 key = GetCenteredPosition(neighbor);
-            if(!dict.blockPosition.ContainsKey(key))
-                return true; // 둘 중 하나라도 없으면 캘 수 있음
-        }
-
-        return false; // 둘 다 있으면 캘 수 없음
-    }
-
-    // 방향 벡터를 8방향 중 하나로 정규화
-    private Vector2 GetSimplifiedDirection(Vector2 dir)
-    {
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        angle = (angle + 360f) % 360f;
-
-        Vector2[] directions = {
-        new Vector2(1, 0),   // →
-        new Vector2(1, 1),   // ↗
-        new Vector2(0, 1),   // ↑
-        new Vector2(-1, 1),  // ↖
-        new Vector2(-1, 0),  // ←
-        new Vector2(-1, -1), // ↙
-        new Vector2(0, -1),  // ↓
-        new Vector2(1, -1)   // ↘
-    };
-
-        int index = Mathf.RoundToInt(angle / 45f) % 8;
-        return directions[index];
     }
 
     // 현재 방향
@@ -353,113 +241,76 @@ public class Pickaxe : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
 
         Vector2 playerPos = player.transform.position;
-        Vector2Int PgridPos = new Vector2Int   // 플레이어 격자 위치
+        Vector2 PgridPos = new Vector2   // 플레이어 격자 위치
         (
-            Mathf.FloorToInt(playerPos.x / tileSize.x),
-            Mathf.FloorToInt(playerPos.y / tileSize.y)
+            Mathf.Floor(playerPos.x / tileSize.x) + 0.5f,
+            Mathf.Floor(playerPos.y / tileSize.y) + 0.5f
         );
+        Vector2 blockPos = hit.collider.transform.position;
 
-        Vector2 blockPos = hit.collider.gameObject.transform.position;
+        Vector2 direction = blockPos - PgridPos;
+        float distance = Vector2.Distance(PgridPos , blockPos);
+        //Debug.Log($"Distance between player and block: {distance:F3}");
 
-        Vector2 direction = blockPos - playerPos;
+        // 1. 클릭된 블럭이 플레이어로부터 1칸 또는 대각선 거리 내에 있을 때만 채굴 가능
+        if(!(Mathf.Abs(distance - 1f) <= 0.95f || Mathf.Abs(distance) <= 1.5f))
+            return blocks;
 
-        for(int i = 0; i < range; i++)
+        bool horizontal = Mathf.Abs(direction.x) >= Mathf.Abs(direction.y);      
+        int steps = horizontal ? (int)_instance._range.x : (int)_instance._range.y;
+        Vector2 stepVector = horizontal ? new Vector2(Mathf.Sign(direction.x), 0)
+                                        : new Vector2(0, Mathf.Sign(direction.y));
+
+        // 주축 방향 블록 추가
+        for(int i = 0; i < steps; i++)
         {
-            float x = direction.x > 0 ? 1 : -1;
-            float y = direction.y > 0 ? 1 : -1;
+            Vector2 currentPos = blockPos + stepVector * i;
+            if(Vector2.Distance(PgridPos, currentPos) > steps) 
+                break;
 
-            Vector2 offset = Mathf.Round(Mathf.Abs(direction.y)) >= 1 ? new Vector2(0, i * y) : new Vector2(i * x, 0);
-            Vector2 blockWorldPos = blockPos + offset;
+            if(blocksDict.blockPosition.TryGetValue(currentPos, out GameObject obj) && !blocks.Contains(obj))
+                blocks.Add(obj);
+        }
 
-            print($"방향: {direction}, offset: {offset}, 블럭위치: {blockWorldPos}");
+        // 대각선 여부 판단
+        bool isDiagonal = Mathf.Abs(direction.x) > 0 && Mathf.Abs(direction.y) > 0
+            && Mathf.Abs(distance) > 1.3f && Mathf.Abs(distance) < 1.5f;
 
-            Vector2Int BgridPos = new Vector2Int    // 블럭 격자 위치
-            (
-                Mathf.FloorToInt(blockWorldPos.x / tileSize.x),
-                Mathf.FloorToInt(blockWorldPos.y / tileSize.y)
-            );
-
-            // 격자 거리 계산(방향 O, 크기 O)
-            Vector2Int diff = BgridPos - PgridPos;
-
-            // 맨해튼 거리(격자 거리)로 1인지 판단 (방향 X, 크기 O)
-            int manhattanDistance = Mathf.Abs(diff.x) + Mathf.Abs(diff.y);
-
-            bool isDiagonalBlock = CanDiagonalBlock(playerPos, diff, blocksDict);
-
-            if(manhattanDistance <= range && !isDiagonalBlock) // 정면(상하좌우)
-            {
-                if(blocksDict.blockPosition.TryGetValue(blockWorldPos, out GameObject obj))
-                {
-                    blocks.Add(obj);
-                }
-            }
-            else if(manhattanDistance <= range + 1 && isDiagonalBlock) // 대각선
-            {
-                if(playerPos.y == diff.y)
-                    return null;
-
-                blocks.Add(hit.collider.gameObject);
-            }
-            else
-            {
-                return null;
-            }
+        // 대각선 블록 처리
+        if(isDiagonal && IsDiagonalAllowed(PgridPos, blockPos, blocksDict))
+        {
+            if(blocksDict.blockPosition.TryGetValue(blockPos, out GameObject diagBlock) && !blocks.Contains(diagBlock))
+                blocks.Add(diagBlock);
         }
 
         return blocks;
     }
 
     // 대각선 여부
-    bool CanDiagonalBlock(Vector2 playerPos, Vector2 diff, BlocksDictionary blocksDict)
+    bool IsDiagonalAllowed(Vector2 playerPos, Vector2 blockPos, BlocksDictionary blocksDict)
     {
+        Vector2Int diff = new Vector2Int(
+            (int)Mathf.Sign(blockPos.x - playerPos.x),
+            (int)Mathf.Sign(blockPos.y - playerPos.y)
+        );
+
+        //float distance = Vector2.Distance(playerPos, blockPos);
+        //Debug.Log($"[IsDiagonalAllowed] diff: ({diff.x}, {diff.y}), distance: {distance:F2}, blockPos: {blockPos}, playerPos: {playerPos}");
+
         if(diff.x == 0 || diff.y == 0)
             return false;
 
-        bool _right = true;
-        bool _left = true;
-        bool _up = true;
-        bool _down = true;
+        bool left = blocksDict.blockPosition.ContainsKey(blockPos + Vector2.left);
+        bool right = blocksDict.blockPosition.ContainsKey(blockPos + Vector2.right);
+        bool up = blocksDict.blockPosition.ContainsKey(blockPos + Vector2.up);
+        bool down = blocksDict.blockPosition.ContainsKey(blockPos + Vector2.down);
 
-        playerPos = new Vector2(Mathf.Floor(playerPos.x) + 0.5f, Mathf.Floor(playerPos.y) + 0.5f);
-
-        Vector2[] directions = new Vector2[]
-        {
-            diff.x > 0 ? Vector2.right : Vector2.left,
-            diff.y > 0 ? Vector2.up : Vector2.down
-        };
-
-        foreach(Vector2 dir in directions)
-        {
-            Vector2 neighborPos = playerPos + dir;
-
-            if(!blocksDict.blockPosition.TryGetValue(neighborPos, out GameObject obj))
-            {
-                if(dir == Vector2.left)
-                    _left = false;
-                else if(dir == Vector2.right)
-                    _right = false;
-                else if(dir == Vector2.up)
-                    _up = false;
-                else if(dir == Vector2.down)
-                    _down = false;
-            }
-        }
-
-        //print($"왼쪽: {_left}, 오른쪽: {_right}, 위쪽: {_up}, 아래쪽: {_down}");
-
-        // 대각선 방향에 따라 필요한 두 방향만 검사
-        if(diff.x > 0 && diff.y > 0)       // ↗
-            return !_right || !_up;
-        else if(diff.x < 0 && diff.y > 0)  // ↖
-            return !_left || !_up;
-        else if(diff.x < 0 && diff.y < 0)  // ↙
-            return !_left || !_down;
-        else if(diff.x > 0 && diff.y < 0)  // ↘
-            return !_right || !_down;
+        if(diff.x < 0 && diff.y > 0) return !right || !down;    // ↖
+        if(diff.x > 0 && diff.y > 0) return !left || !down;   // ↗
+        if(diff.x < 0 && diff.y < 0) return !right || !up;  // ↙
+        if(diff.x > 0 && diff.y < 0) return !left || !up; // ↘
 
         return false;
     }
-
 }
 

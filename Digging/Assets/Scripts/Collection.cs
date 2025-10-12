@@ -47,7 +47,6 @@ public class Collection : MonoBehaviour
     [SerializeField] private GameObject MainPanel;
     [SerializeField] private GameObject[] stagePanels;
 
-
     //#if UNITY_EDITOR
     //    private void OnValidate()
     //    {

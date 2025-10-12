@@ -1,15 +1,24 @@
+using Spine;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class Tool : MonoBehaviour
 {
     public List<GameObject> torchObj = new List<GameObject>();
+
     [SerializeField] private GameObject bombPrefab;
-    public GameObject torchPrefab;
+    public GameObject lampPrefab;
+    [SerializeField] private GameObject teleportPrefab;
     [SerializeField] private Vector2 itemSpawnParent;
 
-    private ItemInstance currentItemInstance; // 현재 장착된 아이템
-    private SlotInfo currentItemSlot; // 해당 아이템이 들어있는 슬롯
+    public IWeapon currentWeapon { get; set; }
+
+    Dictionary<long, WeaponInstance> weaponData = new();
+    Dictionary<ItemTypes, IItem> itemActions;
 
     private static Tool _instance;
     public static Tool Instance
@@ -38,10 +47,20 @@ public class Tool : MonoBehaviour
         }
     }
 
-    public WeaponType currentWeaponType;
+    public SpriteRenderer sprite;
 
-    private Component currentWeaponComponent;
-    [SerializeField] private SpriteRenderer sprite;
+    public WeaponInstance GetData(long id)
+    {
+        if(weaponData.TryGetValue(id, out WeaponInstance data))
+            return data;
+
+        return null;
+    }
+
+    public void SetData(long id, WeaponInstance newdata)
+    {
+        weaponData[id] = newdata;
+    }   
 
     private void Awake()
     {
@@ -55,176 +74,121 @@ public class Tool : MonoBehaviour
         }
 
         sprite = GetComponent<SpriteRenderer>();
+
+        itemActions = new Dictionary<ItemTypes, IItem>
+        {
+            { ItemTypes.Bomb, new BombItem(bombPrefab) },
+            { ItemTypes.Lamp, new LampItem(lampPrefab) },
+            { ItemTypes.Teleport, new TeleportItem(teleportPrefab) },
+        };        
     }
 
-    // 무기 장착 + 표시
-    public void Equip(SlotInfo newSlot)
+    public bool HasWeapon(long id)
     {
-        RemoveCurrentWeaponComponent();
+        return weaponData.ContainsKey(id);
+    }
 
-        // 무기 인스턴스 우선 → 없으면 아이템 인스턴스
-        var instanceW = newSlot._instanceW;
-        var instanceI = newSlot._instanceI;
+    public void EquipWeapon(SlotInfo slot)
+    {
+        ReplaceToolComponent(slot.slot.weapon);
+        currentWeapon.SetInstance(slot.slot.weapon);
 
-        if(instanceW != null)
-        {
-            SetWeaponSprite(instanceW);
-            ReplaceToolComponent(instanceW); // T = WeaponInstance
-            currentItemInstance = null;
-            currentItemSlot = null;
-        }
-        else if(instanceI != null)
-        {
-            SetWeaponSprite(instanceI);
-            currentItemInstance = instanceI;
-            currentItemSlot = newSlot;
-        }
-        else
-        {
-            return; // 인스턴스가 아무것도 없음
-        }
+        SlotManager.Instance.SelectSlot(slot);
     }
 
     // 무기 사용
-    public void UseWeapon(Vector2 mousePos, Player player)
+    public void UseWeapon(SlotInfo slot, Vector2 mousePos, WeaponInstance weapon, Player player)
     {
-        if(currentWeaponComponent == null)
-            return;
-
         PlayerController _player = player.GetComponent<PlayerController>();
-        bool isSanded = _player.ISInSand;   // 모래 갇힘 상태
 
-        if(currentWeaponComponent is Pickaxe pickaxe)
+        if(currentWeapon == null)
         {
-            pickaxe.Digging(mousePos, player, isSanded);
+            ReplaceToolComponent(slot.slot.weapon);
+            SetData(slot.slot.weapon._id, slot.slot.weapon);
         }
-        else if(currentWeaponComponent is Drill drill)
+        else if(currentWeapon.Instance._id != weapon._id)
         {
-            drill.Digging(mousePos, player, isSanded);
+            ReplaceToolComponent(weapon); // 기존 컴포넌트 제거하고 새 무기 등록
+
+            // 중복 저장 방지
+            if(!HasWeapon(weapon._id))
+                SetData(weapon._id, weapon);
         }
+
+        currentWeapon.SetInstance(weapon);
+        sprite.sprite = currentWeapon.Instance.itemImage;
+
+        // UI
+        SlotManager.Instance.SelectSlot(slot);
+
+        currentWeapon?.Use(mousePos, player, _player._state);
     }
 
     // 아이템 사용
-    public void UseItem(bool isGrounded)
+    public void UseItem(SlotInfo slot, bool isGrounded, ItemInstance item)
     {
         itemSpawnParent = GameObject.FindGameObjectWithTag("Player").transform.position;
+        Transform playerContext = transform;
 
-        if(currentItemInstance == null || currentItemInstance._item.count <= 0)
+        if(!itemActions.TryGetValue(item._item.type, out IItem itemAction))
         {
-            Debug.LogWarning("사용 가능한 아이템이 없습니다.");
+            print("지원되지 않는 아이템입니다.");
             return;
         }
 
-        GameObject prefab = null;
-
-        switch(currentItemInstance._item.type)
-        {
-            case ItemType.Bomb:
-                prefab = bombPrefab;
-                
-                break;
-            case ItemType.Torch:
-                if(!isGrounded)
-                {
-                    print("횃불은 공중에서 설치할 수 없습니다.");
-                    return;
-                }
-                prefab = torchPrefab;
-                
-                // 횟불 설치 시 플레이어의 피벗이 (0,0) 위치에 설치 -> 나중에 블럭의 중앙 위치에 설치하게 할 것임.
-                SpriteRenderer sr = GameObject.FindGameObjectWithTag("Player").GetComponent<SpriteRenderer>();
-                float playerSize = sr.size.y;
-                float torchSize = torchPrefab.GetComponent<SpriteRenderer>().size.y;
-                itemSpawnParent = new Vector3(Mathf.Round(transform.position.x - 0.5f) + 0.5f, transform.position.y - (playerSize - torchSize));
-                break;
-            case ItemType.Teleport:
-                if(!isGrounded)
-                {
-                    print("텔레포트는 공중에서 사용할 수 없습니다");
-                    return;
-                }
-                Teleport teleport = new Teleport();
-                teleport.Spawn(transform.parent.GetComponent<PlayerController>());
-                break;
-
-            default:
-                Debug.LogWarning("지원되지 않는 아이템 타입입니다.");
-                return;
-        }
-
-        if(prefab != null && itemSpawnParent != null)
-        {
-            GameObject clone = Instantiate(prefab, itemSpawnParent, Quaternion.identity);
-            clone.transform.position = transform.position; // 플레이어 위치에서 생성 (원하면 조정 가능)
-            clone.transform.SetParent(null); // 부모 움직임의 영향 주지 않기
-
-            if(prefab == torchPrefab)
-                torchObj.Add(clone);
-        }
+        itemAction.Use(item, itemSpawnParent, isGrounded, playerContext);
+        sprite.sprite = slot.slot.item.itemImage;
 
         // 개수 감소
-        currentItemInstance._item.count--;
+        int count = --item._item.count;
+        Inventory.Instance.FreshSlot();
+
         // UI 갱신
-        SlotManager.Instance.UpdateSlotUI(currentItemSlot, currentItemInstance._item);
+        SlotManager.Instance.SelectSlot(slot);
+        UIController.Instance.SetSlotText(slot, count);
     }
 
-    // 장착 해제
-    public void Unequip()
-    {
-        sprite.sprite = null;
-        RemoveCurrentWeaponComponent();
-    }
-
-    // 무기 스프라이트 변경
-    public void SetWeaponSprite<T>(T instance)
-    {
-        if(instance is WeaponInstance weapon)
-        {
-            sprite.sprite = weapon == null ? null : weapon.GetSprite();
-        }
-        else if(instance is ItemInstance item)
-        {
-            sprite.sprite = item == null ? null: item.GetSprite();
-        }
-    }
 
     // 타입에 맞는 무기 데이터 넣기
-    public void ReplaceToolComponent<T>(T instance)
+    public void ReplaceToolComponent(WeaponInstance weapon)
     {
-        if(instance == null) return;
+        // 현재 무기 컴포넌트 찾기
+        IWeapon currentWeaponComponent = GetComponent<IWeapon>();
 
-        Component toolComponent = null;
+        // 교체할 무기의 컴포넌트 타입 얻기
+        Type newWeaponType = GetWeaponTypeFromItemType(weapon._template.type);
 
-        // 무기 타입 처리
-        if(instance is WeaponInstance weapon)
-        {
-            switch(weapon._template.type)
-            {
-                case WeaponType.Pickaxe:
-                    toolComponent = gameObject.AddComponent<Pickaxe>();
-                    ((Pickaxe)toolComponent).Setup(weapon);
-                    break;
+        if(currentWeapon != null && currentWeaponComponent.GetType() == newWeaponType)
+            return; // 같은 무기가 장착되어 있으면 교체 X
 
-                case WeaponType.Drill:
-                    toolComponent = gameObject.AddComponent<Drill>();
-                    ((Drill)toolComponent).Setup(weapon);
-                    break;
-            }
-        }
+        // 기존 무기 컴포넌트 제거
+        if(currentWeaponComponent != null)
+            Destroy(currentWeaponComponent as Component);
 
-        RemoveCurrentWeaponComponent();
+        currentWeapon = (IWeapon)gameObject.AddComponent(newWeaponType);
+    }
+    
+    private Type GetWeaponTypeFromItemType(ItemTypes itemType)  // 무기 추가 시 여기에 추가
+    {
+        if(itemType == ItemTypes.Pickaxe)
+            return typeof(Pickaxe);
+        else if(itemType == ItemTypes.Drill)
+            return typeof(Drill);
 
-        // 현재 장착된 무기 컴포넌트로 등록
-        currentWeaponComponent = toolComponent;
+        // 추가 무기 타입 처리
+        throw new NotImplementedException();
     }
 
-    // 기존 무기 컴포넌트 제거
-    public void RemoveCurrentWeaponComponent()
+    public SlotInfoData GetCurrentWeaponSlotData()
     {
-        if(currentWeaponComponent != null)
-        {
-            Destroy(currentWeaponComponent);
-            currentWeaponComponent = null;
-        }
+        if(currentWeapon == null)
+            return null;
+
+        long id = currentWeapon.Instance._id;
+
+        var slot = SlotManager.Instance.quitSlotUI.slotInfos
+            .FirstOrDefault(s => s.slot != null && s.slot.weapon != null && s.slot.weapon._id == id);
+
+        return slot?.ToData();
     }
 }

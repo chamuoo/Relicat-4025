@@ -21,6 +21,8 @@ public class BlockBombEffect : MonoBehaviour
     int image_idx = 0;
     float frameCount = 0.03f;
 
+    [SerializeField] int damage = 50;
+
     bool isHitPlayer = false;
 
     List<GameObject> hitBlocks = new List<GameObject>();
@@ -120,7 +122,7 @@ public class BlockBombEffect : MonoBehaviour
         if (!isHitPlayer && collision.tag == "Player" && collision.gameObject.GetComponent<PlayerController>() != null)
         {
             isHitPlayer = true;
-            collision.gameObject.GetComponent<PlayerController>().TakeDamage(1, this.transform);
+            collision.gameObject.GetComponent<PlayerController>().TakeDamage(damage, this.transform.position);
         }
 
         if (!(hitBlocks.Contains(collision.gameObject)) && collision.tag == "Block")    //범위 내 블록 파괴 시도, 불필요시 삭제 및 대미지 조정 필요시 조정
@@ -145,7 +147,7 @@ public class BlockBombEffect : MonoBehaviour
 
         if (collision.tag == "Torch")       //범위 내 토치 드랍 시도, 블락 파괴를 안할 시 삭제
         {
-            Torch torchScript = collision.gameObject.GetComponent<Torch>();
+            Lamp torchScript = collision.gameObject.GetComponent<Lamp>();
             if (torchScript != null)
             {
                 torchScript.CheckBelowAndDrop();
@@ -157,7 +159,7 @@ public class BlockBombEffect : MonoBehaviour
         if (!isHitPlayer && collision.tag == "Player" && collision.gameObject.GetComponent<PlayerController>() != null)
         {
             isHitPlayer = true;
-            collision.gameObject.GetComponent<PlayerController>().TakeDamage(1, this.transform);
+            collision.gameObject.GetComponent<PlayerController>().TakeDamage(damage, this.transform.position);
         }
 
         if (!(hitBlocks.Contains(collision.gameObject)) && collision.tag == "Block")    //범위 내 블록 파괴 시도, 불필요시 삭제 및 대미지 조정 필요시 조정
@@ -182,7 +184,7 @@ public class BlockBombEffect : MonoBehaviour
 
         if (collision.tag == "Torch")       //범위 내 토치 드랍 시도, 블락 파괴를 안할 시 삭제
         {
-            Torch torchScript = collision.gameObject.GetComponent<Torch>();
+            Lamp torchScript = collision.gameObject.GetComponent<Lamp>();
             if (torchScript != null)
             {
                 torchScript.CheckBelowAndDrop();
@@ -194,7 +196,7 @@ public class BlockBombEffect : MonoBehaviour
         if (!isHitPlayer && collision.tag == "Player" && collision.gameObject.GetComponent<PlayerController>() != null)
         {
             isHitPlayer = true;
-            collision.gameObject.GetComponent<PlayerController>().TakeDamage(1, this.transform);
+            collision.gameObject.GetComponent<PlayerController>().TakeDamage(damage, this.transform.position);
         }
 
         if (!(hitBlocks.Contains(collision.gameObject)) && collision.tag == "Block")    //범위 내 블록 파괴 시도, 불필요시 삭제 및 대미지 조정 필요시 조정
@@ -219,7 +221,7 @@ public class BlockBombEffect : MonoBehaviour
 
         if (collision.tag == "Torch")       //범위 내 토치 드랍 시도, 블락 파괴를 안할 시 삭제
         {
-            Torch torchScript = collision.gameObject.GetComponent<Torch>();
+            Lamp torchScript = collision.gameObject.GetComponent<Lamp>();
             if (torchScript != null)
             {
                 torchScript.CheckBelowAndDrop();

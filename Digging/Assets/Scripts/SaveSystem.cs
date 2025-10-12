@@ -179,14 +179,9 @@ public class SaveSystem : MonoBehaviour
 
         saveData.quickSlotInfoData = new QuickSlotSaveData
         {
-            slots = quickslotUI.quickSlots
-                .Where(slot => slot != null)
-                .Select(slot => slot.ToData())
-                .ToList(),
+            slots = quickslotUI.ToData(),
 
-            currentWeapon = SlotManager.Instance.currentWeapon != null
-                ? SlotManager.Instance.currentWeapon.ToData()
-                : null
+            currentWeapon = Tool.Instance.GetCurrentWeaponSlotData()
         };
 
 
@@ -214,8 +209,8 @@ public class SaveSystem : MonoBehaviour
             minerals = ConvertItemList(player.minerals),
             UseItems = ConvertItemList(player.UseItems),
             UpgradeItems = ConvertItemList(player.UpgradeItems),
-            Drill_Items = ConvertItemList(player.Drill_Items)
-
+            Drill_Items = ConvertItemList(player.Drill_Items),
+            HP = player.HP.CurrentHP
         };
 
         Tool tool = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Tool>();
@@ -516,12 +511,10 @@ public class SaveSystem : MonoBehaviour
         //횃불위치 로드
         foreach (Vector2 pos in loaded.torchPositionData.torchPositionDatas)
         {
-            GameObject obj = Instantiate(Tool.Instance.torchPrefab, pos, Quaternion.identity);
+            GameObject obj = Instantiate(Tool.Instance.lampPrefab, pos, Quaternion.identity);
             Tool.Instance.torchObj.Add(obj);
         }
 
-        //UI재갱신(아마도 도감도 갱신 넣어야할 예정)
-        SlotManager.Instance.InitFillSlot();
         inventory.FreshSlot();
         print("로드완료");
     }

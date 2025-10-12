@@ -1,5 +1,6 @@
 using JetBrains.Annotations;
 using System.Collections.Generic;
+using System.Data;
 using UnityEngine;
 
 [System.Serializable]
@@ -49,6 +50,7 @@ public class PlayerData
     public List<ItemData> UseItems;
     public List<ItemData> UpgradeItems;
     public List<ItemData> Drill_Items;
+    public float HP;
 }
 
 [System.Serializable]
@@ -107,15 +109,13 @@ public class SlotInfoData   // 슬롯의 데이터들
 {
     public int index;
     public SlotType type;
-    public WeaponInstance instanceW;
-    public ItemInstance instanceI;
+    public SlotData data;
 
-    public SlotInfoData(int index, SlotType type, WeaponInstance instanceW, ItemInstance instanceI)
+    public SlotInfoData(int index, SlotType type, SlotData data)
     {
         this.index = index;
         this.type = type;
-        this.instanceW = instanceW;
-        this.instanceI = instanceI;
+        this.data = data;
     }
 }
 
