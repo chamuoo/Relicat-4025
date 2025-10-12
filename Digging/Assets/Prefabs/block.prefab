@@ -127,6 +127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   relicEffect: {fileID: 1965937476717315258, guid: d42c1c791b82e7a4e8adf2cc57f94f3a, type: 3}
   explodeEffect: {fileID: 1278522267305725683, guid: 2e1f98f8764df494aa0eccdcd6b9326c, type: 3}
+  poisonEffect: {fileID: 8502389485678198407, guid: 93dba2628de4ec54da308387e134bff4, type: 3}
   dropItem: {fileID: 5480586821343649714, guid: 202c5e0557af70e4aaf46a08c4f977b3, type: 3}
   monster1: {fileID: 7607264377076006493, guid: ffa88da670edaeb459bc8f4f0d4202de, type: 3}
   block_Normal_0: {fileID: 21300000, guid: 65023ee168a12c447a36c79744bc962d, type: 3}

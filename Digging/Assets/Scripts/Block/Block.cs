@@ -13,6 +13,8 @@ public class Block : MonoBehaviour
     GameObject actvieRelicEffect;
 
     [SerializeField] GameObject explodeEffect;
+
+    [SerializeField] GameObject poisonEffect;
     
 
     [SerializeField] GameObject dropItem;
@@ -166,7 +168,7 @@ public class Block : MonoBehaviour
     public void ChangeBlock(int newBlockType)   //블럭 교체 명령
     {
         //-2는 세이브데이터에 안들어갈 무적블럭,-1은 무적블럭, 0은 normal, 1은 보물상자, 2는 석탄, 3은 단단한바위, 4는 유물, 5는 몬스터, 6은 모래, 7은 구리, 8은 철(은), 9는 금, 10은 루비, 11은 다이아
-        //101은 독블럭 102는 폭탄블럭
+        //101은 가시블럭 102는 폭탄블럭 103은 독블럭
         //if (blockType != 0)
         //    Debug.Log(transform.position + " : 잘못된 호출");
         if (blockType != -2)
@@ -274,9 +276,9 @@ public class Block : MonoBehaviour
                 blockHealth = 3;
                 blockMaxHealth = 3;
             }
-            else if (newBlockType == 101) //독블럭
+            else if (newBlockType == 101) //가시 블럭
             {
-                spriteRenderer.sprite = block_Poison_0;
+                spriteRenderer.sprite = block_Poison_0; //가시 블럭 이미지 필요
                 blockHealth = 3;
                 blockMaxHealth = 3;
 
@@ -287,6 +289,12 @@ public class Block : MonoBehaviour
             else if (newBlockType == 102) //폭탄 블럭
             {
                 spriteRenderer.sprite = block_Normal_0;
+                blockHealth = 3;
+                blockMaxHealth = 3;
+            }
+            else if(newBlockType == 103) //독 블럭
+            {
+                spriteRenderer.sprite = block_Poison_0; 
                 blockHealth = 3;
                 blockMaxHealth = 3;
             }
@@ -349,13 +357,17 @@ public class Block : MonoBehaviour
                     {
                         spriteRenderer.sprite = block_Jewel_Diamond_1;
                     }
-                    else if(blockType == 101) //독블럭
+                    else if(blockType == 101) //가시블럭
                     {
-                        spriteRenderer.sprite = block_Poison_1;
+                        spriteRenderer.sprite = block_Poison_1; //가시블럭 이미지 필요
                     }
                     else if (blockType == 102) //폭탄 블럭
                     {
                         spriteRenderer.sprite = block_UXB_1;
+                    }
+                    else if (blockType == 103) //독블럭
+                    {
+                        spriteRenderer.sprite = block_Poison_1;
                     }
                 }
                 else if (blockHealth < blockMaxHealth / 4 * 3 && blockHealth >= blockMaxHealth / 2) //블럭 체력이 4분의 3 이하 절반 이상일 때
@@ -396,13 +408,17 @@ public class Block : MonoBehaviour
                     {
                         spriteRenderer.sprite = block_Jewel_Diamond_2;
                     }
-                    else if (blockType == 101) //독블럭
+                    else if (blockType == 101) //가시블럭
                     {
-                        spriteRenderer.sprite = block_Poison_2;
+                        spriteRenderer.sprite = block_Poison_2; //가시블럭 이미지 필요
                     }
                     else if (blockType == 102) //폭탄 블럭
                     {
                         spriteRenderer.sprite = block_UXB_2;
+                    }
+                    else if (blockType == 103) //독블럭
+                    {
+                        spriteRenderer.sprite = block_Poison_2;
                     }
                 }
                 else if (blockHealth < blockMaxHealth / 2 && blockHealth >= blockMaxHealth / 4) //블럭 체력이 절반 이하 4분의 1 이상일 때
@@ -443,13 +459,17 @@ public class Block : MonoBehaviour
                     {
                         spriteRenderer.sprite = block_Jewel_Diamond_3;
                     }
-                    else if (blockType == 101) //독블럭
+                    else if (blockType == 101) //가시블럭
                     {
-                        spriteRenderer.sprite = block_Poison_3;
+                        spriteRenderer.sprite = block_Poison_3; //가시블럭 이미지 필요
                     }
                     else if (blockType == 102) //폭탄 블럭
                     {
                         spriteRenderer.sprite = block_UXB_3;
+                    }
+                    else if (blockType == 103) //독블럭
+                    {
+                        spriteRenderer.sprite = block_Poison_3;
                     }
                 }
                 else if (blockHealth < blockMaxHealth / 4 && blockHealth > 0) //블럭 체력이 4분의 1 이하일 때
@@ -490,13 +510,17 @@ public class Block : MonoBehaviour
                     {
                         spriteRenderer.sprite = block_Jewel_Diamond_4;
                     }
-                    else if (blockType == 101) //독블럭
+                    else if (blockType == 101) //가시블럭
                     {
-                        spriteRenderer.sprite = block_Poison_4;
+                        spriteRenderer.sprite = block_Poison_4; //가시블럭 이미지 필요
                     }
                     else if (blockType == 102) //폭탄 블럭
                     {
                         spriteRenderer.sprite = block_UXB_4;
+                    }
+                    else if (blockType == 103) //독블럭
+                    {
+                        spriteRenderer.sprite = block_Poison_4;
                     }
                 }
             }
@@ -587,7 +611,7 @@ public class Block : MonoBehaviour
                 }
                 else if (blockType == 101) 
                 {
-                    //독블럭 부쉈을 때
+                    //가시블럭 부쉈을 때
                     SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[1]);
                 }
                 else if (blockType == 102) 
@@ -596,6 +620,13 @@ public class Block : MonoBehaviour
                     SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[1]);
 
                     Instantiate(explodeEffect, this.transform.position, Quaternion.identity);
+                }
+                else if (blockType == 103)
+                {
+                    //독블럭 부쉈을 때
+                    SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[1]);
+                    GameObject obj = Instantiate(poisonEffect, this.transform.position, Quaternion.identity);
+                    obj.GetComponent<PoisonEffect>().Initialize(this.transform.position, this.transform.position, 5, 5, 10, true, 3);
                 }
 
                 blocksDictionary.DestroyBlock(this.gameObject);
