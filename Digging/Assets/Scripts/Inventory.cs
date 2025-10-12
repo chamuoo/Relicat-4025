@@ -11,7 +11,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System;
 using Spine;
-using UnityEngine.SceneManagement;
 
 public class Inventory : MonoBehaviour
 {
@@ -40,8 +39,11 @@ public class Inventory : MonoBehaviour
     public GameObject moneyPanel;
     public GameObject healthPanel;
 
-    [SerializeField] private GameObject logMessage_Panel;
+    [SerializeField] private GameObject logText_obj;
     [SerializeField] private TextMeshProUGUI logText;
+    [SerializeField] private GameObject logMessage_Panel;
+    
+    
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -81,7 +83,7 @@ public class Inventory : MonoBehaviour
     public void FreshSlot()
     {
         int i = 0;
-        for(; i < items.Count && i < slots.Length; i++)
+        for (; i < items.Count && i < slots.Length; i++)
         {
             slots[i].item = items[i];
 
@@ -91,7 +93,7 @@ public class Inventory : MonoBehaviour
             text.text = items[i].count.ToString();
         }
 
-        for(; i < slots.Length; i++)
+        for (; i < slots.Length; i++)
         {
             slots[i].item = null;
 
@@ -125,6 +127,7 @@ public class Inventory : MonoBehaviour
                         TextMeshProUGUI text = parent.GetComponentInChildren<TextMeshProUGUI>();
                         Debug.Log(text);
                         text.text = item.count.ToString();
+
                         ItemLog(_item, addEA);
                     }
                 }
@@ -149,6 +152,7 @@ public class Inventory : MonoBehaviour
                     TextMeshProUGUI text = parent.GetComponentInChildren<TextMeshProUGUI>();
                     Debug.Log(text);
                     text.text = _item.count.ToString();
+
                     ItemLog(_item, addEA);
                 }
             }
@@ -376,8 +380,9 @@ public class Inventory : MonoBehaviour
     public void LogMessage(string log)
     {
         logText.text = log;
+        logText_obj.SetActive(true);
 
-        logMessage_Panel.SetActive(true);
+        //logMessage_Panel.SetActive(true);
 
         CancelInvoke("closeLogMessage");
         Invoke("closeLogMessage", 3f);
@@ -385,7 +390,7 @@ public class Inventory : MonoBehaviour
 
     private void closeLogMessage()
     {
-        logMessage_Panel.SetActive(false);
+        logText_obj.SetActive(false);
         logText.text = "";
     }
 }

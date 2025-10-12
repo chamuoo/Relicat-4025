@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -46,6 +47,7 @@ public class Collection : MonoBehaviour
 
     [SerializeField] private GameObject MainPanel;
     [SerializeField] private GameObject[] stagePanels;
+
 
     //#if UNITY_EDITOR
     //    private void OnValidate()
@@ -198,28 +200,28 @@ public class Collection : MonoBehaviour
                 }
                 break;
             case 1:
-                for(int i = 0; i < 20; i++)
+                for(int i = 10; i < 20; i++)
                 {
                     if(li_isRelicOnTable[i] == true)
                     {
                         collect_count++;
                     }
                 }
-                if(collect_count == 20)
+                if(collect_count == 10)
                 {
                     is_collect_complete[player_lv] = true;
                     rewardButton_List[1].GetComponent<Button>().interactable = true;
                 }
                 break;
             case 2:
-                for(int i = 0; i < 30; i++)
+                for(int i = 20; i < 30; i++)
                 {
                     if(li_isRelicOnTable[i] == true)
                     {
                         collect_count++;
                     }
                 }
-                if(collect_count == 30)
+                if(collect_count == 10)
                 {
                     is_collect_complete[player_lv] = true;
                     rewardButton_List[2].GetComponent<Button>().interactable = true;
@@ -232,9 +234,13 @@ public class Collection : MonoBehaviour
 
                 break;
             case 5:
-
                 break;
+        }
 
+        LevelManager.instance.stagetargetNumText.text = collect_count.ToString() + " / 10";
+        if(collect_count == 10)
+        {
+            LevelManager.instance.stageClear();
         }
     }
 
@@ -383,7 +389,7 @@ public class Collection : MonoBehaviour
         {
             if(is_collect_complete[idx] == true)
             {
-                Inventory.ItemLog(badge_items[0], 1);
+                Inventory.ItemLog(badge_items[1], 1);
                 player_lv++;
                 rewardButton_List[idx].GetComponent<Button>().interactable = false;
                 SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[36]);
@@ -407,7 +413,7 @@ public class Collection : MonoBehaviour
         {
             if(is_collect_complete[idx] == true)
             {
-                Inventory.ItemLog(badge_items[1], 1);
+                Inventory.ItemLog(badge_items[2], 1);
                 player_lv++;
                 rewardButton_List[idx].GetComponent<Button>().interactable = false;
                 SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[36]);
@@ -430,7 +436,7 @@ public class Collection : MonoBehaviour
         {
             if(is_collect_complete[idx] == true)
             {
-                Inventory.ItemLog(badge_items[2], 1);
+                Inventory.ItemLog(badge_items[3], 1);
                 player_lv++;
                 rewardButton_List[idx].GetComponent<Button>().interactable = false;
                 SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[36]);

@@ -5,6 +5,7 @@ using Unity.VisualScripting;
 
 #if UNITY_EDITOR
 using UnityEditor.Build;
+using UnityEditor.Experimental.GraphView;
 using UnityEditor.Rendering;
 #endif
 
@@ -424,17 +425,13 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage(int damage, Vector3 attackerPos)
     {
         currentHP -= damage;
-        playerScript.OnHealthCange.Invoke(currentHP);
-
-        if(currentHP <= 0)
-        {
-            //UIManager.Instance.SetObjectActive("HPBar", false);
-            playerScript.GameOver();
-            return;
-        }
-
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[27]);
         StartCoroutine(DamageEffect(attackerPos));
+
+        if(damage > 0)
+        {
+            playerScript.LostHP(damage);
+        }
     }
 
     // 피격 시 색깔 변화와 넉백
@@ -480,7 +477,6 @@ public class PlayerController : MonoBehaviour
         transform.position = new Vector3(15.5f, 0.5f, 0f);
         sr.color = Color.white;
         currentHP = maxHP;
-        playerScript.OnHealthCange.Invoke(currentHP);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

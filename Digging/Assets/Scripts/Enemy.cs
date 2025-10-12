@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour
     float timer = 1f;
     float speed = 1f;
 
-    public int damage = 50;
+    public int damage = 10;
 
     float attackCooldown = 1f;
 

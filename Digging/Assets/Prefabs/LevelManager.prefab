@@ -29,8 +29,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 7420353508533046331}
+  m_Children: []
   m_Father: {fileID: 2165574085033830432}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3747,12 +3746,12 @@ GameObject:
   - component: {fileID: 7972430030416545290}
   - component: {fileID: 4813414727708929287}
   m_Layer: 0
-  m_Name: Text (TMP)
+  m_Name: LogMessage_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7420353508533046331
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3760,17 +3759,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1909081361501045184}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2828096604250784384}
-  m_RootOrder: 0
+  m_Father: {fileID: 2165574085033830432}
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -309.99997}
   m_SizeDelta: {x: 800, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7972430030416545290
@@ -4809,6 +4808,7 @@ RectTransform:
   - {fileID: 2754149424813464143}
   - {fileID: 2475269627250786668}
   - {fileID: 2828096604250784384}
+  - {fileID: 7420353508533046331}
   m_Father: {fileID: 2165574085604915478}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5301,10 +5301,10 @@ MonoBehaviour:
   player: {fileID: 0}
   stagetargetUI: {fileID: 2165574085464270861}
   stagetargetNumText: {fileID: 2165574086159504406}
-  stagetargetNum: 0a000000140000001e000000
+  stagetargetNum: 0a0000000a0000000a000000
   stagetimerText: {fileID: 2165574084650840394}
-  totalTime_1: 900.9
-  totalTime_2: 1800.9
+  totalTime_1: 300.9
+  totalTime_2: 300.9
   remainingTime: 0
   isRunning: 1
   TimeOutUI: {fileID: 2165574085087279250}
@@ -14415,7 +14415,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5870965712568374065
 RectTransform:
   m_ObjectHideFlags: 0
@@ -17067,7 +17067,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5495836918178298431
 RectTransform:
   m_ObjectHideFlags: 0

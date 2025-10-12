@@ -17,7 +17,7 @@ public class LevelManager : MonoBehaviour
 
     // 스테이지 목표 유물 개수
     public GameObject stagetargetUI;
-    [SerializeField] private TextMeshProUGUI stagetargetNumText;
+    public TextMeshProUGUI stagetargetNumText;
     private Color originalTargetTextColor;
     public int[] stagetargetNum = new int[2];
 
@@ -62,6 +62,17 @@ public class LevelManager : MonoBehaviour
     public GameObject NextStageButton;
     public GameObject EndingButton;
 
+    public static LevelManager Instance
+    {
+        get
+        {
+            if(instance == null)
+            {
+                return null;
+            }
+            return instance;
+        }
+    }
 
     void Awake()
     {
@@ -78,20 +89,7 @@ public class LevelManager : MonoBehaviour
         }
 
     }
-    public static LevelManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                return null;
-            }
-            return instance;
-        }
-    }
 
-
-    // Start is called before the first frame update
     void Start()
     {
         if (LoadScene.instance.stage_Level == 0)
@@ -120,33 +118,31 @@ public class LevelManager : MonoBehaviour
         Guide_list[0].SetActive(true);
 
     }
+
     private void OnDestroy()
     {
         // 이벤트 제거 (중복 방지)
         SceneManager.sceneLoaded -= OnSceneLoaded3;
     }
 
+    // 매 씬이 로드가 될 때마다
     private void OnSceneLoaded3(Scene scene, LoadSceneMode mode)
     {
         //if (scene.buildIndex != 2) return;
         //if(scene.buildIndex != 3) return;
-        if(scene.buildIndex == 3)
-        {
-            Toggle_GuidePanel();
-            player = FindObjectOfType<Player>();
-            Debug.Log("asdfaeaafsa");
-        }
-        Debug.Log("asdfaeaafsa11111111111111");
 
         if(scene.buildIndex > 1 && scene.buildIndex < 6)
         {
             UIController.Instance.Initialize();
         }
 
-        if(scene.buildIndex != 3)
+        if(scene.buildIndex == 3)
         {
-            return;
+            Toggle_GuidePanel();
+            player = FindObjectOfType<Player>();
         }
+
+        if(scene.buildIndex != 3) return;
         if(scene.buildIndex == 3)
         {
             Toggle_GuidePanel();
@@ -168,41 +164,22 @@ public class LevelManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (LoadScene.instance.stage_Level == 0)
-        {
-            stagetargetNumText.text = collection.collect_sum.ToString() + " / 10";
-        }
-        else if (LoadScene.instance.stage_Level == 1)
-        {
-            stagetargetNumText.text = collection.collect_sum.ToString() + " / 20";
-        }
-        else if(LoadScene.instance.stage_Level == 2)
-        {
-            stagetargetNumText.text = collection.collect_sum.ToString() + " / 30";
-        }
+        //if (LoadScene.instance.stage_Level == 0)
+        //{
+        //    stagetargetNumText.text = collection.collect_sum.ToString() + " / 10";
+        //}
+        //else if (LoadScene.instance.stage_Level == 1)
+        //{
+        //    stagetargetNumText.text = collection.collect_sum.ToString() + " / 20";
+        //}
+        //else if(LoadScene.instance.stage_Level == 2)
+        //{
+        //    stagetargetNumText.text = collection.collect_sum.ToString() + " / 30";
+        //}
         
         if(collection.collect_sum >= stagetargetNum[LoadScene.instance.stage_Level] && isStageClear == false)
         {
-            stagetargetNumText.color = Color.green;
-            stagetimerText.color = Color.green;
-
-            player.GetComponent<PlayerController>().DisableControls();
-            isRunning = false;
-            SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[37]);
-            isStageClear = true;
-
-            if(LoadScene.instance.stage_Level == 0)
-            {
-                ClearStagePanel_1.SetActive(true);
-            }
-            else if(LoadScene.instance.stage_Level == 1)
-            {
-                ClearStagePanel_2.SetActive(true);
-            }
-            else if(LoadScene.instance.stage_Level == 2)
-            {
-                ClearStagePanel_3.SetActive(true);
-            }
+            
         }
         
         if(SceneManager.GetActiveScene().buildIndex > 2 && stagetargetUI.activeSelf == true && !isStageClear)
@@ -244,15 +221,18 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    void UpdateTimerUI()
+    public void UpdateTimerUI()
     {
         int minutes = Mathf.FloorToInt(remainingTime / 60f);
         int seconds = Mathf.FloorToInt(remainingTime % 60f);
         stagetimerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
+    // 타임 오버
     void TimeOutEvent()
     {
+        player.GetComponent<PlayerController>().DisableControls();
+
         if(remainingTime <= 0)
         {
             TimeOutUI.SetActive(true);
@@ -260,16 +240,41 @@ public class LevelManager : MonoBehaviour
         }
     }
     
+    // 레벨 클리어
+    public void stageClear()
+    {
+        stagetargetNumText.color = Color.green;
+        stagetimerText.color = Color.green;
+
+        isRunning = false;
+        SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[37]);
+        isStageClear = true;
+
+        if (LoadScene.instance.stage_Level == 0)
+        {
+            ClearStagePanel_1.SetActive(true);
+        }
+        else if (LoadScene.instance.stage_Level == 1)
+        {
+            ClearStagePanel_2.SetActive(true);
+        }
+        else if (LoadScene.instance.stage_Level == 2)
+        {
+            ClearStagePanel_3.SetActive(true);
+        }
+
+        player.GetComponent<PlayerController>().DisableControls();
+    }
+
     public void EndingSequence()
     {
         isOnEnding = true;
+
         SaveSystem.Instance.DeleteSaveFile();
         LoadScene.instance.isAlreadyWatchStory = false;
         ResetGame();
         shop.createDrill_textobj.SetActive(true);
         shop.upgradeDrill_textobj.SetActive(false);
-        UIController.Instance.SetObjectActive(0, false);    // 퀵슬롯 
-        UIController.Instance.SetObjectActive(1, false);    // 깊이
         Collection.instance.player.Inventory_obj.SetActive(false);
         Collection.instance.player.CollectUIPanel.SetActive(false);
         //Inventory.badgePanel.SetActive(false);
@@ -287,13 +292,11 @@ public class LevelManager : MonoBehaviour
         LoadScene.instance.stage_Level = 0;
         ClearStagePanel_3.SetActive(false);
         EndingButton.SetActive(false);
-        //SlotManager.Instance.quitSlotUI.ResetQuickSlot();
     }
 
     public void GoNextStageButton()
     {
         LoadScene.instance.stage_Level += 1;
-
         if (LoadScene.instance.stage_Level == 0)
         {
             remainingTime = totalTime_1;
@@ -312,6 +315,9 @@ public class LevelManager : MonoBehaviour
         stagetimerText.color = originalTimerTextColor;
 
         collection.collect_sum = 0;
+        collection.collect_count = 0;
+        stagetargetNumText.text = collection.collect_count.ToString() + " / 10";
+
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[28]);
         //isStageClear = false;
 
@@ -352,6 +358,7 @@ public class LevelManager : MonoBehaviour
         EndingButton.SetActive(true);
     }
 
+    // 레벨 클리어 닫음
     public void CloseClearPanel_1()
     {
         //LoadScene.instance.stage_Level = 1;
@@ -386,6 +393,7 @@ public class LevelManager : MonoBehaviour
         Collection.instance.player.Inventory_obj.SetActive(false);
         Collection.instance.player.CollectUIPanel.SetActive(false);
     }
+
     public void CloseClearPanel_2()
     {
         //LoadScene.instance.stage_Level = 1;
@@ -408,7 +416,6 @@ public class LevelManager : MonoBehaviour
         isStageClear = false;
 
         ClearStagePanel_2.SetActive(false);
-        collection.player.player.EnableControls();
 
         LoadScene.instance.GoMenu();
         SaveSystem.Instance.Save();
@@ -443,10 +450,10 @@ public class LevelManager : MonoBehaviour
         isStageClear = false;
 
         ClearStagePanel_3.SetActive(false);
-        collection.player.player.EnableControls();
 
         LoadScene.instance.GoMenu();
         SaveSystem.Instance.Save();
+
         stagetargetUI.SetActive(false);
         guide_Button.SetActive(false);
         pause_Button.SetActive(false);
@@ -455,6 +462,7 @@ public class LevelManager : MonoBehaviour
         Collection.instance.player.CollectUIPanel.SetActive(false);
     }
 
+    // 스테이지 리셋 버튼(다시 씬 로드)
     public void Restart_this_Stage_Button()
     {
         SaveSystem.Instance.DeleteSaveFile();
@@ -481,6 +489,8 @@ public class LevelManager : MonoBehaviour
         collection.player.UpgradeItems[0].value = 10;
         collection.player.UpgradeItems[1].count = 1;
         collection.player.UpgradeItems[1].value = 50;
+        collection.player.UpgradeItems[2].count = 1;
+        collection.player.UpgradeItems[2].value = 50;
 
         collection.Inventory.money_item.count = 0;
         collection.Inventory.ClearItem();
@@ -520,6 +530,8 @@ public class LevelManager : MonoBehaviour
         LoadScene.instance.GoMain();
         TimeOutUI.SetActive(false);
     }
+    
+    // 타임오버(나가기 버튼)
     public void Restart_Go_Menu_Button()
     {
         SaveSystem.Instance.DeleteSaveFile();
@@ -546,6 +558,8 @@ public class LevelManager : MonoBehaviour
         collection.player.UpgradeItems[0].value = 10;
         collection.player.UpgradeItems[1].count = 1;
         collection.player.UpgradeItems[1].value = 50;
+        collection.player.UpgradeItems[2].count = 1;
+        collection.player.UpgradeItems[2].value = 50;
 
         collection.player.Drill_Items[1].count = 0;
         collection.player.Drill_Items[2].count = 0;
@@ -591,7 +605,6 @@ public class LevelManager : MonoBehaviour
         Collection.instance.player.Inventory_obj.SetActive(false);
     }
 
-
     // 게임 초기화
     public void ResetGame()
     {
@@ -620,6 +633,8 @@ public class LevelManager : MonoBehaviour
         collection.player.UpgradeItems[0].value = 10;
         collection.player.UpgradeItems[1].count = 1;
         collection.player.UpgradeItems[1].value = 50;
+        collection.player.UpgradeItems[2].count = 1;
+        collection.player.UpgradeItems[2].value = 50;
 
         collection.player.Drill_Items[1].count = 0;
         collection.player.Drill_Items[2].count = 0;
@@ -661,8 +676,10 @@ public class LevelManager : MonoBehaviour
         TimeOutUI.SetActive(false);
     }
 
+    // 버튼 입력에 의한 일시정지 ||
     public void Toggle_Pause_Panel()
     {
+        player.GetComponent<PlayerController>().DisableControls();
         collection.player.TogglePause();
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[29]);
     }
@@ -683,6 +700,7 @@ public class LevelManager : MonoBehaviour
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[29]);
     }
     
+    // 가이드
     public void Button_Left()
     {
         guideView_idx -= 1;
@@ -695,8 +713,6 @@ public class LevelManager : MonoBehaviour
         Switch_GuideView();
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[30]);
     }
-
-    
     public void Button_Right()
     {
         guideView_idx += 1;

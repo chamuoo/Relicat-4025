@@ -113,7 +113,6 @@ public class LoadScene : MonoBehaviour
             startText.color = Color.white;
             continueText.color = new Color(1, 1, 1, 0.3f);
         }
-
         //ºº¿Ã∫Í
         if(Input.GetKeyDown(KeyCode.LeftBracket))
         {
@@ -165,7 +164,6 @@ public class LoadScene : MonoBehaviour
         difficulty_panel.SetActive(false);
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[28]);
     }
-
     void InvokeLoadMain()
     {
         MainMenu.SetActive(false);

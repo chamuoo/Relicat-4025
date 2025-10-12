@@ -1,3 +1,4 @@
+using System.Xml.Schema;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,26 +6,37 @@ public class PlayerHPBar : MonoBehaviour
 {
     [SerializeField] Transform player;
     [SerializeField] Slider hpBar;
+    [SerializeField] private Image HP_fillimage;
 
-    float currentHP = 1;
-    public float CurrentHP => currentHP;
+    [SerializeField] float targetHP;
 
-    private void Start()
+    private void Awake()
     {
-        hpBar.value = CurrentHP;
+        // 슬라이더에서 Fill 이미지 찾아서 저장
+        HP_fillimage = GetComponentInChildren<Slider>()
+            .fillRect.GetComponent<Image>();
     }
 
     private void Update()
     {
         transform.position = player.transform.position;
-        hpBar.value = Mathf.Lerp(hpBar.value, currentHP, Time.deltaTime * 5f);
+        hpBar.value = Mathf.Lerp(hpBar.value, targetHP, Time.deltaTime * 5f);
+
+        float displayRatio = hpBar.value;
+
+        if(displayRatio > 0.7f)
+            HP_fillimage.color = Color.green;  // 안정
+        else if(displayRatio > 0.4f)
+            HP_fillimage.color = Color.yellow; // 경고
+        else 
+            HP_fillimage.color = Color.red;    // 위험
     }
 
+
     // HP Bar Value 변화
-    public void UpdateHP(float hp)
+    public void UpdateHP(float curHP)
     {
-        hp = Mathf.Round((hp / 100) * 100) / 100f;  // 둘째자리까지 나오게 하기
-        currentHP = hp;
+        targetHP = curHP;
     }
-    
+
 }

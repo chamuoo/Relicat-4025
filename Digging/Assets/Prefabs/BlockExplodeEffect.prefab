@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 1278522267305725683}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.8, y: 2.8, z: 2.8}
+  m_LocalScale: {x: 4.5, y: 4.5, z: 4.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 1570297691
   m_SortingLayer: 5
   m_SortingOrder: 0
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -108778228, guid: 0a4f1752958dff5409cb456eba4b48a4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -84,7 +84,7 @@ SpriteRenderer:
   m_Size: {x: 0.07920792, y: 0.07920792}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!61 &4715690738069713069
@@ -111,7 +111,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.62, y: 0.62}
   m_EdgeRadius: 0
 --- !u!114 &2102617829938473365
 MonoBehaviour:
@@ -135,7 +135,6 @@ MonoBehaviour:
   blockBombEffect_6: {fileID: 1091624556, guid: 0a4f1752958dff5409cb456eba4b48a4, type: 3}
   blockBombEffect_7: {fileID: -600811956, guid: 0a4f1752958dff5409cb456eba4b48a4, type: 3}
   blockBombEffect_8: {fileID: -332044851, guid: 0a4f1752958dff5409cb456eba4b48a4, type: 3}
-  damage: 20
 --- !u!50 &978908301468355072
 Rigidbody2D:
   serializedVersion: 4

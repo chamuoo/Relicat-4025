@@ -73,7 +73,7 @@ VertexOutput vert(VertexInput input)
 fixed4 frag(VertexOutput input) : SV_Target
 {
 	fixed4 texureColor = calculateTexturePixel(input.texcoord.xy);
-	RETURN_UNLIT_IF_ADDITIVESlot_TINT(texureColor, input.color, input.darkColor, _Color.a, _Black.a) // shall be called before ALPHA_CLIP
+	RETURN_UNLIT_IF_ADDITIVE_SLOT_TINT(texureColor, input.color, input.darkColor, _Color.a, _Black.a) // shall be called before ALPHA_CLIP
 	ALPHA_CLIP(texureColor, input.color)
 
 #if defined(_TINT_BLACK_ON)

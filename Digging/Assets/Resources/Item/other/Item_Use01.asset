@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: "\uD3ED\uD0C4"
   itemImage: {fileID: 21300000, guid: 71055363e9f540145a16ac69c5266653, type: 3}
   type: 32
-  count: 3
+  count: 0
   stackLimit: 99
   accumulation_count: 0
   isMineral: 0

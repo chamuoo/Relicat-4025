@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b81c96ecd3f7b634aba59c5ff6767807, type: 3}
+  m_Name: UpgradeObj_03
+  m_EditorClassIdentifier: 
+  itemName: "\uCCB4\uB825 \uAC15\uD654"
+  type: 0
+  itemImage: {fileID: 21300000, guid: 4beceb2c2eb3ac64183a620ee853e51b, type: 3}
+  count: 1
+  stackLimit: 0
+  accumulation_count: 0
+  isMineral: 0
+  isRelic: 0
+  isDrillItem: 0
+  rarity: 0
+  value: 50
+  duplicate_value: 0
+  ishaveitem: 0
+  isalreadySell: 0
+  Info: "\uCCB4\uB825\uC774 \uC99D\uAC00\uD55C\uB2E4."
