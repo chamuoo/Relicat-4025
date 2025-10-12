@@ -9,6 +9,7 @@ public class Chunk : MonoBehaviour
     [SerializeField] BlocksDictionary blocksDictionary;
     [SerializeField] GameObject[] blocks;
     [SerializeField] BlockBreakingEffectManager effectManager;
+    [SerializeField] int depth = 1;     //깊이값, 아직 활용 예정 없음
 
     [SerializeField] int boxCount = 1;       //생성할 랜덤박스 개수
     [SerializeField] int jewelWithHardBlockCount = 2;//생성할 보석+단단한블럭 개수
@@ -72,8 +73,8 @@ public class Chunk : MonoBehaviour
             hardBlockCount = 3;    //생성할 단단한블럭 개수
             unbreakableCount = 0;  //생성할 안부서지는블럭 개수
             monsterBlockCount = 0;  //생성할 몬스터블럭 개수
-            poisonBlcokCount = 0;   //생성할 독블럭 개수
             explodeBlockCount = 0;   //생성할 폭탄블럭 개수
+            poisonBlcokCount = 0;   //생성할 독블럭 개수
         }
         else if (LoadScene.instance.difficulty_level == 0)
         {
@@ -85,8 +86,8 @@ public class Chunk : MonoBehaviour
             hardBlockCount = 7;    //생성할 단단한블럭 개수
             unbreakableCount = 3;  //생성할 안부서지는블럭 개수
             monsterBlockCount = 0;  //생성할 몬스터블럭 개수
-            poisonBlcokCount = 0;   //생성할 독블럭 개수(임의)
             explodeBlockCount = 0;   //생성할 폭탄블럭 개수(임의)
+            poisonBlcokCount = 0;   //생성할 독블럭 개수(임의)
         }
         else if (LoadScene.instance.difficulty_level == 1)
         {
@@ -98,8 +99,8 @@ public class Chunk : MonoBehaviour
             hardBlockCount = 7;    //생성할 단단한블럭 개수
             unbreakableCount = 3;  //생성할 안부서지는블럭 개수
             monsterBlockCount = 1;  //생성할 몬스터블럭 개수
-            poisonBlcokCount = 2;   //생성할 독블럭 개수(임의)
             explodeBlockCount = 2;   //생성할 폭탄블럭 개수(임의)
+            poisonBlcokCount = 2;   //생성할 독블럭 개수(임의)
         }
         else if (LoadScene.instance.difficulty_level == 2)
         {
@@ -111,8 +112,8 @@ public class Chunk : MonoBehaviour
             hardBlockCount = 7;    //생성할 단단한블럭 개수
             unbreakableCount = 3;  //생성할 안부서지는블럭 개수
             monsterBlockCount = 2;  //생성할 몬스터블럭 개수
-            poisonBlcokCount = 5;   //생성할 독블럭 개수(임의)
             explodeBlockCount = 5;   //생성할 폭탄블럭 개수
+            poisonBlcokCount = 5;   //생성할 독블럭 개수(임의)
         }
         else
         {
@@ -340,13 +341,13 @@ public class Chunk : MonoBehaviour
         generateBlock(numbers, blockChangeCount, monsterBlockCount, 5);
         //몬스터블럭 생성 끝
 
-        //독블럭 생성 시작
-        generateBlock(numbers, blockChangeCount, poisonBlcokCount, 101);
-        //독블럭 생성 끝
-
         //폭탄블럭 생성 시작
         generateBlock(numbers, blockChangeCount, poisonBlcokCount, 102);
         //폭탄블럭 생성 끝
+
+        //독블럭 생성 시작
+        generateBlock(numbers, blockChangeCount, poisonBlcokCount, 103);
+        //독블럭 생성 끝
     }
 
 
