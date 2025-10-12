@@ -179,7 +179,7 @@ public class PoisonEffect : MonoBehaviour
         {
             canAttackPlayer = false;
             attackTimer = 1.0f;
-            collision.gameObject.GetComponent<PlayerController>().TakeDamage(1, this.transform);
+            collision.gameObject.GetComponent<PlayerController>().TakeDamage(1, this.transform.position);
         }
     }
     private void OnTriggerStay2D(Collider2D collision)
@@ -188,7 +188,7 @@ public class PoisonEffect : MonoBehaviour
         {
             canAttackPlayer = false;
             attackTimer = 1.0f;
-            collision.gameObject.GetComponent<PlayerController>().TakeDamage(1, this.transform);
+            collision.gameObject.GetComponent<PlayerController>().TakeDamage(1, this.transform.position);
         }
     }
     private void OnTriggerExit2D(Collider2D collision)
@@ -197,7 +197,7 @@ public class PoisonEffect : MonoBehaviour
         {
             canAttackPlayer = false;
             attackTimer = 1.0f;
-            collision.gameObject.GetComponent<PlayerController>().TakeDamage(1, this.transform);
+            collision.gameObject.GetComponent<PlayerController>().TakeDamage(1, this.transform.position);
         }
     }
 }

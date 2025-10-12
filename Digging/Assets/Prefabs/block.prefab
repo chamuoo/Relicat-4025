@@ -170,6 +170,36 @@ MonoBehaviour:
   block_Rock_2: {fileID: 21300000, guid: 9fd26174aa54e4c49bcba485ebd73d9b, type: 3}
   block_Rock_3: {fileID: 21300000, guid: fa1e07d97f697e84f93d8d94a5da3104, type: 3}
   block_Rock_4: {fileID: 21300000, guid: fea72f842a5639a4a945f022b5ab979b, type: 3}
+  block_RockJewel_Coal_0: {fileID: 21300000, guid: 003cdfe4ad4f028448547df00c3752cf, type: 3}
+  block_RockJewel_Coal_1: {fileID: 21300000, guid: 87a86cccefb29bf419ed291e333c1700, type: 3}
+  block_RockJewel_Coal_2: {fileID: 21300000, guid: 10a02d2952499ea41b52c63952c02caa, type: 3}
+  block_RockJewel_Coal_3: {fileID: 21300000, guid: b87ca0f46d58d1241aebc2a46ca78be8, type: 3}
+  block_RockJewel_Coal_4: {fileID: 21300000, guid: ee56a04b121f976418c99309f9e57c9f, type: 3}
+  block_RockJewel_Copper_0: {fileID: 21300000, guid: e6bccac272a667148907c489bb24994f, type: 3}
+  block_RockJewel_Copper_1: {fileID: 21300000, guid: 059a4285a57e4b444b0ce9b66e879460, type: 3}
+  block_RockJewel_Copper_2: {fileID: 21300000, guid: df13930c0a5ef6e42865e629abe743dd, type: 3}
+  block_RockJewel_Copper_3: {fileID: 21300000, guid: eb435166d4a1f814b9c7a8f2e585fb96, type: 3}
+  block_RockJewel_Copper_4: {fileID: 21300000, guid: 8814a210455dd4941be01861babd436c, type: 3}
+  block_RockJewel_Iron_0: {fileID: 21300000, guid: 5ac4de45f9586554da60f0ff3ff72cb9, type: 3}
+  block_RockJewel_Iron_1: {fileID: 21300000, guid: fe2daff11a658834493dc86c40477471, type: 3}
+  block_RockJewel_Iron_2: {fileID: 21300000, guid: 0bfaf1356bd6dfb48b15b313f2bee86f, type: 3}
+  block_RockJewel_Iron_3: {fileID: 21300000, guid: 041dab4bfdc8bae4fa860eb41556bc7a, type: 3}
+  block_RockJewel_Iron_4: {fileID: 21300000, guid: 77cae5eeda432bf409118dfc0e82f2da, type: 3}
+  block_RockJewel_Gold_0: {fileID: 21300000, guid: 3ad7cc142b1713e469c4feb38ec1d149, type: 3}
+  block_RockJewel_Gold_1: {fileID: 21300000, guid: a228e3b6c7fcf2d44aed220fce947d42, type: 3}
+  block_RockJewel_Gold_2: {fileID: 21300000, guid: b5e6f35bc00f6be418905bd4739679f8, type: 3}
+  block_RockJewel_Gold_3: {fileID: 21300000, guid: f2586f3952987ef48a8c9fd6eb583a7a, type: 3}
+  block_RockJewel_Gold_4: {fileID: 21300000, guid: bbe98e54280b1d24ab561bc17a0299a3, type: 3}
+  block_RockJewel_Ruby_0: {fileID: 21300000, guid: d06f9a58596d5994f997dcedf35d6163, type: 3}
+  block_RockJewel_Ruby_1: {fileID: 21300000, guid: 399f25b87d9ff7b4b80ed80a3f3ed31f, type: 3}
+  block_RockJewel_Ruby_2: {fileID: 21300000, guid: e1ef5d9ebd310634882f8a9f00929c93, type: 3}
+  block_RockJewel_Ruby_3: {fileID: 21300000, guid: d470d2e9e19c82b419870d3ecf3acb93, type: 3}
+  block_RockJewel_Ruby_4: {fileID: 21300000, guid: 6b9afb59007709348b493a1b39bd11ac, type: 3}
+  block_RockJewel_Diamond_0: {fileID: 21300000, guid: ba0cca8f53459054c8ee54d1483e7693, type: 3}
+  block_RockJewel_Diamond_1: {fileID: 21300000, guid: 35eb858b975aff64f9e6df735b323052, type: 3}
+  block_RockJewel_Diamond_2: {fileID: 21300000, guid: 900168d1d3a75a44f8e1150cd6e988c6, type: 3}
+  block_RockJewel_Diamond_3: {fileID: 21300000, guid: 424db602008777549ac2e96ecb5eb8d2, type: 3}
+  block_RockJewel_Diamond_4: {fileID: 21300000, guid: 47ae47e1c4ae7104dbd08809e7dc25bc, type: 3}
   block_Sand_0: {fileID: 21300000, guid: 7607028946a38df4e85886a156840bee, type: 3}
   block_Sand_1: {fileID: 21300000, guid: b1173b797507f0b45a1a694f8073063b, type: 3}
   block_Sand_2: {fileID: 21300000, guid: ec466a02a4390dd498a7df79af9952f3, type: 3}

@@ -6,8 +6,34 @@ public class ChunkManager : MonoBehaviour
 {
     [SerializeField] GameObject[] chunks;
     [SerializeField] GameObject player;
+    [SerializeField] int resetBoxCount = 1;
 
     float activeDistance = 16.0f;
+
+    private void Awake()
+    {
+        //리셋 박스 지정 시작
+        List<int> numbers = new List<int>();
+        for (int i = 0; i < chunks.Length; i++)
+        {
+            numbers.Add(i);
+        }
+        for (int i = 0; i < numbers.Count; i++)
+        {
+            int randIdx = Random.Range(i, numbers.Count);
+            (numbers[i], numbers[randIdx]) = (numbers[randIdx], numbers[i]);
+        }
+
+        for (int i = 0; i < resetBoxCount; i++)
+        {
+            Chunk chunkScript = chunks[numbers[i]].GetComponent<Chunk>();
+            if (chunkScript != null)
+            {
+                chunkScript.isResetBox = true;
+            }
+        }
+        //리셋 박스 지정 끝
+    }
 
     private void Start()
     {
