@@ -42,7 +42,11 @@ public class PlayerController : MonoBehaviour
     // 데미지
     [SerializeField] float sandTimer;
     [SerializeField] float sandDamage;
-    [SerializeField] int fallDamage;
+
+    [SerializeField] int fallDamageH;
+    [SerializeField] int fallDamageM;
+    [SerializeField] int fallDamageL;
+    int curFallDamage;
 
     bool isFlying;
     private ItemTypes isActiveType;
@@ -52,19 +56,19 @@ public class PlayerController : MonoBehaviour
     [Header("Movement Settings")]
     float gravity = -9.81f;
 
-    [SerializeField] float speed = 8f;
-    [SerializeField] float extraAcceleration = 1.2f;
+    [SerializeField] float speed = 7f;
+    [SerializeField] float extraAcceleration = 1.8f;    // 추가 가속도
 
-    float MAX_VELOCITY_X = 8;
-    float MAX_VELOCITY_Y = 10;
+    float MAX_VELOCITY_X = 7.5f;
+    float MAX_VELOCITY_Y = 9.5f;
 
     // 낙하 데미지
     float FALL_MAX_VELOCITY = -5.5f;
     float FALL_MIN_VELOCITY = -9f;
 
     // Damage System
-    int maxHP;
-    [SerializeField] int currentHP = 0;
+    private DamageManager damageManager;
+    private int SAND_DAMAGE;
 
     // Block Detection
     [SerializeField] private LayerMask targetLayer;
@@ -191,9 +195,6 @@ public class PlayerController : MonoBehaviour
 
         targetLayer = LayerMask.GetMask("Block", "Floor");
 
-        maxHP = 100;
-        currentHP = maxHP;
-
         anim = GetComponent<Animator>();
 
         jetpack = transform.Find("jetpack/Anim").GetComponent<Animator>();
@@ -203,6 +204,17 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        damageManager = new DamageManager();
+
+        SAND_DAMAGE = damageManager.GetDamage(LoadScene.instance.difficulty_level,
+                ObstacleType.Sand);
+        fallDamageH = damageManager.GetDamage(LoadScene.instance.difficulty_level,
+               ObstacleType.Fall_High);
+        fallDamageM = damageManager.GetDamage(LoadScene.instance.difficulty_level,
+               ObstacleType.Fall_Mid);
+        fallDamageL = damageManager.GetDamage(LoadScene.instance.difficulty_level,
+               ObstacleType.Fall_Low);
+
         _state = PlayerState.NONE;
         jetpackEffect = GameObject.Find("Ef_Jetpack");
     }
@@ -307,7 +319,7 @@ public class PlayerController : MonoBehaviour
             col.enabled = false;
 
             // 플레이어 모래 위치로 이동
-            transform.position = Vector3.Lerp(transform.position, target.transform.position, 0.01f);
+            transform.position = Vector3.Lerp(transform.position, target.transform.position, Time.deltaTime * 5f);
             if(Vector3.Distance(transform.position, target.transform.position) <= 0.1f)
                 transform.position = target.transform.position;
 
@@ -317,8 +329,9 @@ public class PlayerController : MonoBehaviour
 
             if(sandTimer >= 1f)
             {
-                TakeDamage(1, Vector3.zero);
                 sandTimer = 0;
+                print("데미지: " + SAND_DAMAGE);
+                TakeDamage(SAND_DAMAGE, Vector3.zero);
             }
         }
         else
@@ -374,18 +387,18 @@ public class PlayerController : MonoBehaviour
 
         if(direction.y > 0)
         {
-            if(isGround) // 순간 속도
-            {
-                velocity.y = direction.y * speed * 0.1f;
-            }
+            //if(isGround) // 순간 속도
+            //{
+            //    velocity.y = direction.y * speed * 0.1f;
+            //}
 
             // 떨어지는 중일 때 플레이어가 하강속도보다 낮은 속도이기 때문에 속도를 높이기 위해 변수를 곱함.
             velocity.y += direction.y * (velocity.y < 0 ? speed * extraAcceleration : speed) * Time.fixedDeltaTime;
         }
         else if(!isGround)
         {
-            if(velocity.y > 0)  // 플레이어가 바로 떨어지기 위해
-                velocity.y = 0;
+            //if(velocity.y > 0)  // 플레이어가 바로 떨어지기 위해
+            //    velocity.y = 0;
 
             velocity.y += gravity * Time.fixedDeltaTime;
         }
@@ -424,7 +437,6 @@ public class PlayerController : MonoBehaviour
     // 피해 처리
     public void TakeDamage(int damage, Vector3 attackerPos)
     {
-        currentHP -= damage;
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[27]);
         StartCoroutine(DamageEffect(attackerPos));
 
@@ -476,7 +488,6 @@ public class PlayerController : MonoBehaviour
         isDie = true;
         transform.position = new Vector3(15.5f, 0.5f, 0f);
         sr.color = Color.white;
-        currentHP = maxHP;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -487,27 +498,24 @@ public class PlayerController : MonoBehaviour
         {
             if(contact.normal.y >= 0.9f)
             {
-                fallDamage = 0;
+                curFallDamage = 0;
 
                 if(velocity.y <= FALL_MAX_VELOCITY)  // 낙하데미지(speed가 8인 경우 블럭 기준)
                 {
                     //print("속도1: " + velocity.y);
 
                     if(velocity.y <= FALL_MIN_VELOCITY)   // (5칸 이상)
-                        fallDamage = 20;
+                        curFallDamage = fallDamageH;
                     else if(velocity.y <= -6f)          // (3 ~ 4칸)
-                        fallDamage = 10;
+                        curFallDamage = fallDamageM;
                     else
-                        fallDamage = 5;             // (2칸 절반 이상 3칸 이하)
+                        curFallDamage = fallDamageL;             // (2칸 절반 이상 3칸 이하)
                 }
 
                 velocity = Vector2.zero;
 
-                if(LoadScene.Instance.stage_Level == 0)
-                    fallDamage = 0;
-
-                if(fallDamage > 0)
-                    TakeDamage(fallDamage, Vector3.zero);
+                if(curFallDamage > 0)
+                    TakeDamage(curFallDamage, Vector3.zero);
 
                 return;
             }

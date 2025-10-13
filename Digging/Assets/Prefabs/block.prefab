@@ -96,7 +96,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 1812071150501119636}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 1fc99bae56d811f43ab0ae9df1b65cb4, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -208,6 +208,8 @@ MonoBehaviour:
   block_unbreakable_0: {fileID: 21300000, guid: 6ca785946826488488f6193c53db908a, type: 3}
   boxCloseSprite: {fileID: 21300000, guid: b9c014df8fbd4ae4281a081c0cd835f0, type: 3}
   boxOpenSprite: {fileID: 21300000, guid: 295090e2154a2314b9288e304890a78c, type: 3}
+  resetBoxCloseSprite: {fileID: 0}
+  resetBoxOpenSprite: {fileID: 0}
   block_Poison_0: {fileID: 21300000, guid: 8b19c88d36a4d7040b4c529a169ffa5b, type: 3}
   block_Poison_1: {fileID: 21300000, guid: b474459947ddb574181a46d90436fbb1, type: 3}
   block_Poison_2: {fileID: 21300000, guid: d1d68e25a0e65a04cab12bd0b9f2037b, type: 3}

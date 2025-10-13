@@ -106,6 +106,11 @@ public class Pickaxe : MonoBehaviour, IWeapon
                 return null;
 
             var blocksDict = hit.collider.GetComponent<Block>().blocksDictionary;
+            if(hit.collider == null || blocksDict == null)
+            {
+                return null;
+            }
+
             blocks = ToGrid(hit, blocksDict);
         }
 

@@ -17,8 +17,6 @@ public class EnergyBar : MonoBehaviour
 
     public void SetValue(float value)
     {
-        slider.value = value / 100f;
-
         // 내구도가 깎인 경우만 슬라이더 보이기
         if(slider.value < 1f)
             gameObject.SetActive(true);

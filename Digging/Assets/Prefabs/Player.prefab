@@ -431,9 +431,9 @@ MonoBehaviour:
   sandDamage: 0
   fallDamage: 0
   isDie: 0
-  speed: 8
-  extraAcceleration: 1.2
-  currentHP: 0
+  speed: 7
+  extraAcceleration: 2.5
+  currentHP: 100
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -573,6 +573,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  hPBar: {fileID: 0}
+  total_maxHP: 0
   PausePanel: {fileID: 0}
   isPaused: 0
   DiePanel: {fileID: 0}
@@ -585,7 +587,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 66881f593f024084a96ad4499142c339, type: 3}
   - {fileID: 21300000, guid: 4156db76b26132942adcbc26bc53fd07, type: 3}
   - {fileID: 21300000, guid: 31be56298c52fad4ea29404dd5947d30, type: 3}
-  hPBar: {fileID: 0}
 --- !u!58 &7350869211537410046
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -21,7 +21,9 @@ public class BlockBombEffect : MonoBehaviour
     int image_idx = 0;
     float frameCount = 0.03f;
 
-    [SerializeField] int damage = 50;
+    // 데미지
+    private DamageManager damageManager;
+    private int BOMBBLOCK_DAMAGE;
 
     bool isHitPlayer = false;
 
@@ -33,8 +35,14 @@ public class BlockBombEffect : MonoBehaviour
     {
         playerScript = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
     }
+
     private void Start()
     {
+        damageManager = new DamageManager();
+
+        BOMBBLOCK_DAMAGE = damageManager.GetDamage(LoadScene.instance.difficulty_level,
+                ObstacleType.BombBlock);
+
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[19]);
     }
 
@@ -122,7 +130,7 @@ public class BlockBombEffect : MonoBehaviour
         if (!isHitPlayer && collision.tag == "Player" && collision.gameObject.GetComponent<PlayerController>() != null)
         {
             isHitPlayer = true;
-            collision.gameObject.GetComponent<PlayerController>().TakeDamage(damage, this.transform.position);
+            collision.gameObject.GetComponent<PlayerController>().TakeDamage(BOMBBLOCK_DAMAGE, this.transform.position);
         }
 
         if (!(hitBlocks.Contains(collision.gameObject)) && collision.tag == "Block")    //범위 내 블록 파괴 시도, 불필요시 삭제 및 대미지 조정 필요시 조정
@@ -159,7 +167,7 @@ public class BlockBombEffect : MonoBehaviour
         if (!isHitPlayer && collision.tag == "Player" && collision.gameObject.GetComponent<PlayerController>() != null)
         {
             isHitPlayer = true;
-            collision.gameObject.GetComponent<PlayerController>().TakeDamage(damage, this.transform.position);
+            collision.gameObject.GetComponent<PlayerController>().TakeDamage(BOMBBLOCK_DAMAGE, this.transform.position);
         }
 
         if (!(hitBlocks.Contains(collision.gameObject)) && collision.tag == "Block")    //범위 내 블록 파괴 시도, 불필요시 삭제 및 대미지 조정 필요시 조정
@@ -196,7 +204,7 @@ public class BlockBombEffect : MonoBehaviour
         if (!isHitPlayer && collision.tag == "Player" && collision.gameObject.GetComponent<PlayerController>() != null)
         {
             isHitPlayer = true;
-            collision.gameObject.GetComponent<PlayerController>().TakeDamage(damage, this.transform.position);
+            collision.gameObject.GetComponent<PlayerController>().TakeDamage(BOMBBLOCK_DAMAGE, this.transform.position);
         }
 
         if (!(hitBlocks.Contains(collision.gameObject)) && collision.tag == "Block")    //범위 내 블록 파괴 시도, 불필요시 삭제 및 대미지 조정 필요시 조정

@@ -9,6 +9,10 @@ public class PoisonEffect : MonoBehaviour
     [SerializeField] PoisonEffectManager effectManager;
     public List<ParticleSystem> pss = new List<ParticleSystem>();
 
+    // 데미지
+    private DamageManager damageManager;
+    private int POISON_DAMAGE;
+
     float timer = 10;   //없어지거나 리젠되기 까지의 시간
     bool isBlockPoison = false;     //블록 파생의 독안개인지 확인, 타이머가 다 지났을 때 이게 true로 되어있다면 없어지게 함
     public bool isOperate = false;
@@ -20,6 +24,14 @@ public class PoisonEffect : MonoBehaviour
     Vector2 rightBottomPos;
     float SizeX;
     float SizeY;
+
+    private void Start()
+    {
+        damageManager = new DamageManager();
+
+        POISON_DAMAGE = damageManager.GetDamage(LoadScene.instance.difficulty_level,
+                ObstacleType.Poison);
+    }
 
     public void Initialize(Vector2 newLeftTopPos, Vector2 newRightBottomPos, int newSizeX, int newSizeY, float newTimer = 10, bool newIsBlockPoison = false, float newAttackTimer = 3.0f)
     {
@@ -179,7 +191,7 @@ public class PoisonEffect : MonoBehaviour
         {
             canAttackPlayer = false;
             attackTimer = 1.0f;
-            collision.gameObject.GetComponent<PlayerController>().TakeDamage(1, this.transform.position);
+            collision.gameObject.GetComponent<PlayerController>().TakeDamage(POISON_DAMAGE, this.transform.position);
         }
     }
     private void OnTriggerStay2D(Collider2D collision)
@@ -188,7 +200,7 @@ public class PoisonEffect : MonoBehaviour
         {
             canAttackPlayer = false;
             attackTimer = 1.0f;
-            collision.gameObject.GetComponent<PlayerController>().TakeDamage(1, this.transform.position);
+            collision.gameObject.GetComponent<PlayerController>().TakeDamage(POISON_DAMAGE, this.transform.position);
         }
     }
     private void OnTriggerExit2D(Collider2D collision)
@@ -197,7 +209,7 @@ public class PoisonEffect : MonoBehaviour
         {
             canAttackPlayer = false;
             attackTimer = 1.0f;
-            collision.gameObject.GetComponent<PlayerController>().TakeDamage(1, this.transform.position);
+            collision.gameObject.GetComponent<PlayerController>().TakeDamage(POISON_DAMAGE, this.transform.position);
         }
     }
 }

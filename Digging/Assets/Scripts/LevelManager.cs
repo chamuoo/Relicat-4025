@@ -176,12 +176,12 @@ public class LevelManager : MonoBehaviour
         //{
         //    stagetargetNumText.text = collection.collect_sum.ToString() + " / 30";
         //}
-        
+
         if(collection.collect_sum >= stagetargetNum[LoadScene.instance.stage_Level] && isStageClear == false)
         {
-            
+
         }
-        
+
         if(SceneManager.GetActiveScene().buildIndex > 2 && stagetargetUI.activeSelf == true && !isStageClear)
         {
             if (!isRunning)

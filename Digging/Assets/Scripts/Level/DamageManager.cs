@@ -8,6 +8,14 @@ public class DamageManager
     {
         damageMap = new()
         {
+            [-1] = new() // 튜토리얼
+            {
+                [ObstacleType.Bomb] = 0,
+                [ObstacleType.Fall_High] = 0,
+                [ObstacleType.Fall_Mid] = 0,
+                [ObstacleType.Fall_Low] = 0,
+                [ObstacleType.Sand] = 0
+            },
             [0] = new() // 쉬움
             {
                 [ObstacleType.Bomb] = 10,
@@ -44,6 +52,7 @@ public class DamageManager
     }
 
     public int GetDamage(int difficulty, ObstacleType type) =>
-        damageMap.TryGetValue(difficulty, out var table) && table.TryGetValue(type, out var dmg) ? dmg : 0;
+        damageMap.TryGetValue(LoadScene.instance.isUseStart ? -1 : difficulty, out var table) &&
+        table.TryGetValue(type, out var dmg) ? dmg : 0;
 }
 

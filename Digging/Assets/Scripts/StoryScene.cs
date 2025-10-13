@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Spine.Unity;
+using UnityEngine.EventSystems;
 
 public class StoryScene : MonoBehaviour
 {
@@ -69,6 +70,8 @@ public class StoryScene : MonoBehaviour
 
     void InvokeLoadScene()
     {
+        if(EventSystem.current != null) EventSystem.current.enabled = true; // È°¼ºÈ­
+
         Invoke("invokeMore", 1.5f);
         SceneManager.LoadScene(2);
     }

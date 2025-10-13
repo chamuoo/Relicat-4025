@@ -210,7 +210,6 @@ public class SaveSystem : MonoBehaviour
             UseItems = ConvertItemList(player.UseItems),
             UpgradeItems = ConvertItemList(player.UpgradeItems),
             Drill_Items = ConvertItemList(player.Drill_Items),
-            HP = player.HP
         };
 
         Tool tool = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Tool>();

@@ -11,6 +11,7 @@ public class Bomb : MonoBehaviour
     [SerializeField] Player playerScript;
     [SerializeField] private ItemInstance _instance;
 
+    private DamageManager damageManager;
     private int damage;
 
     // 카운트
@@ -39,8 +40,6 @@ public class Bomb : MonoBehaviour
     private bool isGrounded = false;
     private bool isAlreadyDamaged = false;
 
-    private DamageManager damageManager;
-
     private void Awake()
     {
         originalScale = Vector3.one;
@@ -55,6 +54,9 @@ public class Bomb : MonoBehaviour
     {
         timer = countdown;
         damageManager = new DamageManager();
+
+        damage = damageManager.GetDamage(LoadScene.instance.difficulty_level,
+                ObstacleType.Bomb);
 
         // 생성 후, 던지기
         //Throw(GetPlayerDirection());
@@ -248,9 +250,7 @@ public class Bomb : MonoBehaviour
         PlayerController player = hit.GetComponent<PlayerController>();
         if(player != null)
         {
-            int damage = damageManager.GetDamage(LoadScene.instance.difficulty_level,
-                ObstacleType.Bomb);
-
+            print("데미지 폭탄: " + damage);
             player.TakeDamage(damage, transform.position);
             isAlreadyDamaged = true;
         }

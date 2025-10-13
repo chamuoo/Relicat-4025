@@ -10,13 +10,18 @@ public class Enemy : MonoBehaviour
     float timer = 1f;
     float speed = 1f;
 
-    public int damage = 10;
+    private DamageManager damageManager;
+    public int damage;
 
     float attackCooldown = 1f;
 
     void Start()
     {
         rigidbody = this.gameObject.GetComponent<Rigidbody2D>();
+        damageManager = new DamageManager();
+
+        damage = damageManager.GetDamage(LoadScene.instance.stage_Level,
+                ObstacleType.Monster);
     }
 
     void Update()

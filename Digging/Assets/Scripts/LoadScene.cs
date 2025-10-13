@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 
 public class LoadScene : MonoBehaviour
 {
@@ -34,7 +35,7 @@ public class LoadScene : MonoBehaviour
 
 
     // 레벨
-    public int stage_Level = 0;
+    public int stage_Level = -1;    // 튜토리얼
 
     // 난이도
     public int difficulty_level = 1;
@@ -130,7 +131,7 @@ public class LoadScene : MonoBehaviour
         {
             SaveSystem.Instance.DeleteSaveFile();
             isAlreadyWatchStory = false;
-            stage_Level = 0;
+            stage_Level = -1;
         }
     }
 
@@ -144,11 +145,14 @@ public class LoadScene : MonoBehaviour
 
     public void GoMain()
     {
+        if(EventSystem.current != null) EventSystem.current.enabled = false; // 활성화
+
         FadeEffect.Instance.OnFade(FadeState.FadeInOut);
         if(isAlreadyWatchStory == false)
         {
             isUseStart = true;
             isAlreadyWatchStory = true;
+
             Invoke("InvokeLoadStory", 1.5f);
         }
         else if(isAlreadyWatchStory == true)
@@ -184,11 +188,15 @@ public class LoadScene : MonoBehaviour
     }
     void InvokeLoadStory()
     {
+        if(EventSystem.current != null) EventSystem.current.enabled = true; // 활성화
+
         MainMenu.SetActive(false);
         SceneManager.LoadScene("Story");
     }
     void InvokeLoadMenu()
     {
+        if(EventSystem.current != null) EventSystem.current.enabled = true; // 활성화
+
         MainMenu.SetActive(true);
         SceneManager.LoadScene("Menu");
     }

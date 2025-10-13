@@ -12,6 +12,7 @@ using UnityEditor.SearchService;
 using System.Collections.ObjectModel;
 using Unity.VisualScripting;
 using UnityEngine.PlayerLoop;
+using System.Linq;
 
 public class Player : MonoBehaviour
 {
@@ -77,11 +78,10 @@ public class Player : MonoBehaviour
     public Dictionary<string, bool> DicPlayerHeart = new Dictionary<string, bool>();
 
     // 플레이어 HP
-    [SerializeField] PlayerHPBar hPBar;
-    int init_maxHP = 100;
-    public int total_maxHP;
-    int _currentHP;
-    public int HP => _currentHP;
+    public PlayerHPBar hPBar;
+    float init_maxHP = 1;
+    public float total_maxHP;
+    float _currentHP;
 
     // 일시정지
     [SerializeField] private GameObject PausePanel;
@@ -137,6 +137,7 @@ public class Player : MonoBehaviour
         //}
 
         player = GetComponent<PlayerController>();
+        
         //if(!File.Exists(savePath))  // 저장 없을 때
         //    InitItemCount();
     }
@@ -154,6 +155,9 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     private IEnumerator Start()
     {
+        UIController.Instance.SetObjectActive(0, true);
+        UIController.Instance.SetObjectActive(1, true);
+
         // UI 시작/도착 포지션 지정
         Inventory_StartPos = new Vector3(-200f, Screen.height / 2, 0f);
         Inventory_EndPos = new Vector3(0f, Screen.height / 2, 0f);
@@ -287,6 +291,9 @@ public class Player : MonoBehaviour
             SaveSystem.Instance.Save();
         }
 
+        // 초기 HP
+        total_maxHP = init_maxHP + (UpgradeItems[2].count - 1);
+        _currentHP = total_maxHP;
         SetHP();
     }
 
@@ -316,93 +323,6 @@ public class Player : MonoBehaviour
             Shop.instance.pickImage.sprite = pick_imgs[0];
         }
 
-        if(isPaused == false)
-        {
-            Interaction_Inventory();
-            Interaction_F();
-            //GroundAutoHeal();
-            Ground_Time_Pause();
-
-            if(Input.GetKeyDown(KeyCode.P))
-            {
-
-                if(isdebugmode == false)
-                {
-                    isdebugmode = true;
-                    Inventory.LogMessage("개발자모드입니다.");
-                }
-                else if(isdebugmode == true)
-                {
-                    isdebugmode = false;
-                    Inventory.LogMessage("개발자모드가 해제되었습니다.");
-                }
-            }
-
-            if(isdebugmode == true)
-            {
-                if(Input.GetKeyDown(KeyCode.G))
-                {
-                    Inventory.AddItem(UseItems[0], 3);
-                    Inventory.AddItem(UseItems[1], 10);
-                }
-                if(Input.GetKeyDown(KeyCode.H))
-                {
-                    AddPlayerLife(1);
-                }
-
-                if(Input.GetKeyDown(KeyCode.Z))
-                {
-                    Inventory.AddItem(minerals[0], 1);
-                }
-
-                if(Input.GetKeyDown(KeyCode.X))
-                {
-                    Inventory.AddItem(minerals[3], 100000);
-                }
-
-                if(Input.GetKeyDown(KeyCode.C))
-                {
-                    Inventory.AddItem(items[UnityEngine.Random.Range(0, 20)], 1);
-                }
-
-                if(Input.GetKeyDown(KeyCode.V))
-                {
-                    Inventory.AddItem(items[5], 1);
-                }
-
-                if(Input.GetKeyDown(KeyCode.B))
-                {
-                    Inventory.AddItem(items[7], 1);
-                    Inventory.AddItem(Drill_Items[1], 1);
-                    Inventory.AddItem(Drill_Items[2], 1);
-                    Inventory.AddItem(Drill_Items[3], 1);
-                }
-
-                if(Input.GetKeyDown(KeyCode.L))
-                {
-                    Collection.player_lv += 1;
-                }
-
-                //세이브
-                if(Input.GetKeyDown(KeyCode.LeftBracket))
-                {
-                    SaveSystem.Instance.Save();
-                }
-
-                //로드
-                if(Input.GetKeyDown(KeyCode.RightBracket))
-                {
-                    SaveSystem.Instance.Load();
-                }
-
-                // 세이브 삭제
-                if(Input.GetKeyDown(KeyCode.M))
-                {
-                    Reset_SaveFile_and_GoMenu();
-                }
-            }
-
-        }
         if(isPaused == false)
         {
             Interaction_Inventory();
@@ -491,10 +411,12 @@ public class Player : MonoBehaviour
         // 일시정지 esc
         if(Input.GetKeyDown(KeyCode.Escape))
         {
-            player.DisableControls();
             TogglePause();
             SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[29]);
+
         }
+
+
     }
 
     public void Reset_SaveFile_and_GoMenu()
@@ -508,6 +430,8 @@ public class Player : MonoBehaviour
         Inventory.badgePanel.SetActive(false);
         Inventory.moneyPanel.SetActive(false);
         Inventory.healthPanel.SetActive(false);
+        UIController.Instance.SetObjectActive(0, false);
+        UIController.Instance.SetObjectActive(1, false);
         LevelManager.instance.stagetargetUI.SetActive(false);
         LevelManager.instance.ClearStagePanel_1.SetActive(false);
         LevelManager.instance.ClearStagePanel_2.SetActive(false);
@@ -877,15 +801,6 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void GameOver()
-    {
-        player.DisableControls();
-        hPBar.gameObject.SetActive(false);
-        DiePanel.SetActive(true);
-        isPaused = true;
-        LevelManager.instance.isRunning = false;
-    }
-
     // 리스폰 버튼
     public void Respawn_Button()
     {
@@ -977,11 +892,11 @@ public class Player : MonoBehaviour
 
     public void LostHP(int amount)
     {
-        _currentHP -= amount;
+        _currentHP = _currentHP - (amount / 100f);
         _currentHP = Mathf.Clamp(_currentHP, 0, total_maxHP);
         SetHP();
 
-        if(_currentHP <= 0)
+        if(_currentHP <= 0.0f)
         {
             player.DisableControls();
             DiePanel.SetActive(true);
@@ -1020,8 +935,6 @@ public class Player : MonoBehaviour
         total_maxHP = init_maxHP + (UpgradeItems[2].count - 1);
         float ratio = (float)_currentHP / total_maxHP;
         hPBar.UpdateHP(ratio);
-
-        _currentHP = total_maxHP;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
