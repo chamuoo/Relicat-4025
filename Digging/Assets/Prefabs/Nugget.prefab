@@ -97,8 +97,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2588d7e5081c7914e960c41d0b0b4053, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
+  player: {fileID: 1876708861729411069}
   hpBar: {fileID: 2654197909610045219}
+  HP_fillimage: {fileID: 7304578307211486251}
+  targetHP: 0
 --- !u!1 &1747550819058908659
 GameObject:
   m_ObjectHideFlags: 0

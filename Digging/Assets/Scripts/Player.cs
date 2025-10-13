@@ -11,7 +11,6 @@ using UnityEditor.SearchService;
 
 using System.Collections.ObjectModel;
 using Unity.VisualScripting;
-using System;
 using UnityEngine.PlayerLoop;
 
 public class Player : MonoBehaviour
@@ -107,9 +106,6 @@ public class Player : MonoBehaviour
     // 입력 액션
     public System.Action<bool> OnInventoryOpen;
 
-    // 로드했는지에 대한 여부
-    bool isLoaded = false;
-
     private string savePath => Application.persistentDataPath + "/SaveData.json";
 
     private void Awake()
@@ -158,15 +154,12 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     private IEnumerator Start()
     {
-        player.EnableControls();
-        isLoaded = false;
-
         // UI 시작/도착 포지션 지정
         Inventory_StartPos = new Vector3(-200f, Screen.height / 2, 0f);
         Inventory_EndPos = new Vector3(0f, Screen.height / 2, 0f);
 
-        Shop_StartPos = new Vector3(2420f, Screen.height / 2, 0f);
-        Shop_EndPos = new Vector3(1945f, Screen.height / 2, 0f);
+        Shop_StartPos = new Vector3(2550f, Screen.height / 2, 0f);
+        Shop_EndPos = new Vector3(1920f, Screen.height / 2, 0f);
 
         Collect_StartPos = new Vector3(3420f, Screen.height / 2, 0f);
         Collect_EndPos = new Vector3(1920f, Screen.height / 2, 0f);
@@ -174,6 +167,8 @@ public class Player : MonoBehaviour
         Tool.Instance.torchObj.Clear();
         // 한 프레임 대기 (인스턴스 초기화 대기)
         yield return null;
+
+        player.EnableControls();
 
         // Inventory 스크립트 연결
         Inventory = Inventory.Instance ?? FindObjectOfType<Inventory>();
@@ -218,9 +213,10 @@ public class Player : MonoBehaviour
           }*/
 
         SlotManager.Instance.quitSlotUI.InitFillData();
+        SlotManager.Instance.quitSlotUI.ClearAllSlots();
 
         Inventory_obj.transform.position = new Vector3(-200f, Screen.height / 2, 0f);
-        shopUIPanel.transform.position = new Vector3(2420f, Screen.height / 2, 0f);
+        shopUIPanel.transform.position = new Vector3(2550f, Screen.height / 2, 0f);
         CollectUIPanel.transform.position = new Vector3(3420f, Screen.height / 2, 0f);
 
         shopUIPanel.GetComponent<RectTransform>().sizeDelta = new Vector2(630, 0);
@@ -245,15 +241,12 @@ public class Player : MonoBehaviour
             if(LoadScene.instance.isUseContinue == true)
             {
                 LoadScene.instance.isUseContinue = false;
-                //Inventory.FreshSlot();
                 SaveSystem.Instance.Load();
-                isLoaded = true;
             }
             //SaveSystem.Instance.Save();
         }
         else if(File.Exists(savePath))
         {
-            SlotManager.Instance.quitSlotUI.ClearAllSlots();
             //Inventory.FreshSlot();
             SaveSystem.Instance.Load();
         }
@@ -277,7 +270,6 @@ public class Player : MonoBehaviour
 
             Inventory.AddItem(UseItems[0], 3);
             Inventory.AddItem(UseItems[1], 10);
-
             //SaveSystem.Instance.Save();
         }
 
@@ -291,6 +283,7 @@ public class Player : MonoBehaviour
         {
             string jsonForLoad = File.ReadAllText(savePath);
             SaveData loaded = JsonUtility.FromJson<SaveData>(jsonForLoad);
+            SlotManager.Instance.LoadQuickSlots(loaded);
             SaveSystem.Instance.Save();
         }
 
@@ -302,24 +295,24 @@ public class Player : MonoBehaviour
     {
         currentTime += Time.deltaTime;
 
-        if(UpgradeItems[0].count >= 50)
+        if(UpgradeItems[0].count >= 21)
         {
-            Shop.instance.pickImage.sprite = pick_imgs[4];
-        }
-        else if(UpgradeItems[0].count >= 40)
-        {
+            //pick_obj.GetComponent<SpriteRenderer>().sprite = pick_imgs[3];
             Shop.instance.pickImage.sprite = pick_imgs[3];
         }
-        else if(UpgradeItems[0].count >= 25)
+        else if(UpgradeItems[0].count >= 11)
         {
+            //pick_obj.GetComponent<SpriteRenderer>().sprite = pick_imgs[2];
             Shop.instance.pickImage.sprite = pick_imgs[2];
         }
-        else if(UpgradeItems[0].count >= 15)
+        else if(UpgradeItems[0].count >= 5)
         {
+            //pick_obj.GetComponent<SpriteRenderer>().sprite = pick_imgs[1];
             Shop.instance.pickImage.sprite = pick_imgs[1];
         }
         else
         {
+            //pick_obj.GetComponent<SpriteRenderer>().sprite = pick_imgs[0];
             Shop.instance.pickImage.sprite = pick_imgs[0];
         }
 
@@ -410,6 +403,90 @@ public class Player : MonoBehaviour
             }
 
         }
+        if(isPaused == false)
+        {
+            Interaction_Inventory();
+            Interaction_F();
+            //GroundAutoHeal();
+            Ground_Time_Pause();
+
+            if(Input.GetKeyDown(KeyCode.P))
+            {
+
+                if(isdebugmode == false)
+                {
+                    isdebugmode = true;
+                    Inventory.LogMessage("개발자모드입니다.");
+                }
+                else if(isdebugmode == true)
+                {
+                    isdebugmode = false;
+                    Inventory.LogMessage("개발자모드가 해제되었습니다.");
+                }
+            }
+
+            if(isdebugmode == true)
+            {
+                if(Input.GetKeyDown(KeyCode.G))
+                {
+                    Inventory.AddItem(UseItems[0], 3);
+                    Inventory.AddItem(UseItems[1], 10);
+                }
+
+
+                if(Input.GetKeyDown(KeyCode.Z))
+                {
+                    Inventory.AddItem(minerals[0], 1);
+                }
+
+                if(Input.GetKeyDown(KeyCode.X))
+                {
+                    Inventory.AddItem(minerals[3], 100000);
+                }
+
+                if(Input.GetKeyDown(KeyCode.C))
+                {
+                    Inventory.AddItem(items[Random.Range(0, 20)], 1);
+                }
+
+                if(Input.GetKeyDown(KeyCode.V))
+                {
+                    Inventory.AddItem(items[5], 1);
+                }
+
+                if(Input.GetKeyDown(KeyCode.B))
+                {
+                    Inventory.AddItem(items[7], 1);
+                    Inventory.AddItem(Drill_Items[1], 1);
+                    Inventory.AddItem(Drill_Items[2], 1);
+                    Inventory.AddItem(Drill_Items[3], 1);
+                }
+
+                if(Input.GetKeyDown(KeyCode.L))
+                {
+                    Collection.player_lv += 1;
+                }
+
+                //세이브
+                if(Input.GetKeyDown(KeyCode.LeftBracket))
+                {
+                    SaveSystem.Instance.Save();
+                }
+
+                //로드
+                if(Input.GetKeyDown(KeyCode.RightBracket))
+                {
+                    SaveSystem.Instance.Load();
+                }
+
+                // 세이브 삭제
+                if(Input.GetKeyDown(KeyCode.M))
+                {
+                    Reset_SaveFile_and_GoMenu();
+                }
+            }
+
+        }
 
         // 일시정지 esc
         if(Input.GetKeyDown(KeyCode.Escape))
@@ -423,11 +500,10 @@ public class Player : MonoBehaviour
     public void Reset_SaveFile_and_GoMenu()
     {
         SaveSystem.Instance.DeleteSaveFile();
+        SaveSystem.Instance.DeleteSaveFile();
         LoadScene.instance.isAlreadyWatchStory = false;
         LevelManager.instance.remainingTime = LevelManager.instance.totalTime_1;
         LevelManager.instance.Restart_Go_Menu_Button();
-        UIController.Instance.SetObjectActive(0, false);    // 퀵슬롯 
-        UIController.Instance.SetObjectActive(1, false);    // 깊이
         Inventory_obj.SetActive(false);
         Inventory.badgePanel.SetActive(false);
         Inventory.moneyPanel.SetActive(false);
@@ -443,7 +519,6 @@ public class Player : MonoBehaviour
         Shop.createDrill_textobj.SetActive(true);
         Shop.upgradeDrill_textobj.SetActive(false);
         LoadScene.instance.stage_Level = 0;
-        //SlotManager.Instance.quitSlotUI.ResetQuickSlot();
     }
 
     // 게임 일시정지 / 재개
@@ -559,7 +634,6 @@ public class Player : MonoBehaviour
         // 상점 UI 이동 애니메이션
         if(isShopMoving && !isOnShop)
         {
-            player.DisableControl(1);
             currentTime += Time.deltaTime;
             float t = Mathf.Clamp01(currentTime / moveTime);
             shopUIPanel.transform.position = Vector3.Lerp(Shop_StartPos, Shop_EndPos, t);
@@ -588,14 +662,13 @@ public class Player : MonoBehaviour
         if(isNearShop && Input.GetKeyDown(KeyCode.F) && !isInventoryMoving && !isShopMoving)
         {
             player.DisableControl(1);
+
+            currentTime = 0f;
             currentTime = 0f;
             SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[29]);
             if(isOnInventory && !isOnShop)
             {
                 isShopMoving = true;
-
-                Shop.shop_pickLvText.text = "레벨 : " + UpgradeItems[0].count;
-                Shop.shop_lightLvText.text = "레벨 : " + UpgradeItems[1].count;
 
             }
             else
@@ -603,6 +676,15 @@ public class Player : MonoBehaviour
                 isShopMoving = true;
                 isInventoryMoving = true;
             }
+
+            Shop.shop_pickLvText.text = "레벨 : " + UpgradeItems[0].count;
+            Shop.shop_lightLvText.text = "레벨 : " + UpgradeItems[1].count;
+            Shop.shop_hpLvText.text = "레벨 : " + UpgradeItems[2].count;
+
+            Shop.shop_pickUpdateText.text = "-" + UpgradeItems[0].value.ToString();
+            Shop.shop_lightUpdateText.text = "-" + UpgradeItems[1].value.ToString();
+            Shop.shop_hpUpdateText.text = "-" + UpgradeItems[2].value.ToString();
+
         }
         else if(!isNearShop && isOnShop && !isInventoryMoving && !isShopMoving)
         {
@@ -610,7 +692,6 @@ public class Player : MonoBehaviour
             currentTime = 0f;
             isInventoryMoving = true;
             isShopMoving = true;
-
         }
 
         // 박물관 상호작용

@@ -19,11 +19,16 @@ public class Shop : MonoBehaviour
     public int shopView_idx;
     [SerializeField] private GameObject[] shopList;
 
+    // 곡괭이
     public Image pickImage;
     public TextMeshProUGUI shop_pickLvText;
     public TextMeshProUGUI shop_pickUpdateText;
+    // 시야
     public TextMeshProUGUI shop_lightLvText;
     public TextMeshProUGUI shop_lightUpdateText;
+    // 체력
+    public TextMeshProUGUI shop_hpLvText;
+    public TextMeshProUGUI shop_hpUpdateText;
 
     public GameObject playerlight;
 
@@ -36,6 +41,9 @@ public class Shop : MonoBehaviour
     public GameObject upgradeDrill_textobj;
     public TextMeshProUGUI drill_Lv_Text;
     public bool isCreateDrill;
+
+    // 시간 구매
+    private int timer_value = 100;
 
     private void Awake()
     {
@@ -51,13 +59,13 @@ public class Shop : MonoBehaviour
             Destroy(this.gameObject); // 중복 방지
         }
 
-
     }
 
     private void Start()
     {
         shopView_idx = 0;
-        Switch_ShopView();
+
+        //Switch_ShopView();
 
         //if(SlotManager.Instance.IsEquipWeapon(WeaponType.Pickaxe) == true)
         //    pick_damage = SlotManager.Instance.currentWeapon._instanceW._damage;
@@ -77,7 +85,7 @@ public class Shop : MonoBehaviour
         player = FindObjectOfType<Player>();
         playerController = FindObjectOfType<PlayerController>();
         playerlight = GameObject.Find("Spot Light 2D");
-        lightRadius = playerlight?.GetComponent<Light2D>()?.pointLightOuterRadius ?? 0f;
+        lightRadius = playerlight.GetComponent<Light2D>().pointLightOuterRadius;
         //Debug.Log(playerlight.gameObject.name);
 
         if(player != null)

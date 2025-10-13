@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5147785622460300175}
   - component: {fileID: 5147785622460300168}
+  - component: {fileID: 1049686380511853698}
   m_Layer: 0
   m_Name: SlotManager
   m_TagString: Untagged
@@ -24,7 +25,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5147785622460300170}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -960, y: -540, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -46,10 +47,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   energy: {fileID: 8770361550798401439, guid: 7fd2513284e37734da25139f29c3a944, type: 3}
+  energyClone: {fileID: 0}
   quitSlotUI: {fileID: 3896021151829247659}
   inventoyUI: {fileID: 0}
   inventory: {fileID: 0}
   _isOpen: 0
+--- !u!114 &1049686380511853698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5147785622460300170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1300b6f0778311449d5a1f75002781d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weapons: []
+  items: []
 --- !u!1001 &5147785621582287009
 PrefabInstance:
   m_ObjectHideFlags: 0
