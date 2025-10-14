@@ -202,7 +202,7 @@ public class Pickaxe : MonoBehaviour, IWeapon
 
         if(isDigging)
         {
-            t += Time.deltaTime * (_instance._damage / 2);
+            t += Time.deltaTime * (_instance._damage / 4);
             t = Mathf.Clamp01(t);
 
             angle = Mathf.Lerp(60, -30, t);

@@ -15,6 +15,17 @@ using Spine;
 public class Inventory : MonoBehaviour
 {
     public static Inventory instance;
+    public static Inventory Instance
+    {
+        get
+        {
+            if(instance == null)
+            {
+                return null;
+            }
+            return instance;
+        }
+    }
     public Collection collection;
 
     public List<Item> items;
@@ -65,18 +76,6 @@ public class Inventory : MonoBehaviour
         }
 
         FreshSlot();
-    }
-
-    public static Inventory Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                return null;
-            }
-            return instance;
-        }
     }
 
     // 슬롯 새로고침

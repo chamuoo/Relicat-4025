@@ -41,11 +41,10 @@ public class PlayerController : MonoBehaviour
 
     // 데미지
     [SerializeField] float sandTimer;
-    [SerializeField] float sandDamage;
 
-    [SerializeField] int fallDamageH;
-    [SerializeField] int fallDamageM;
-    [SerializeField] int fallDamageL;
+    public int fallDamageH;
+    public int fallDamageM;
+    public int fallDamageL;
     int curFallDamage;
 
     bool isFlying;
@@ -56,19 +55,21 @@ public class PlayerController : MonoBehaviour
     [Header("Movement Settings")]
     float gravity = -9.81f;
 
+    // 속도 변경
     [SerializeField] float speed = 7f;
-    [SerializeField] float extraAcceleration = 1.8f;    // 추가 가속도
+    [SerializeField] float extraAcceleration = 2.5f;    // 추가 가속도
 
-    float MAX_VELOCITY_X = 7.5f;
-    float MAX_VELOCITY_Y = 9.5f;
+    // 최대 속도
+    float MAX_VELOCITY_X = 7f;
+    float MAX_VELOCITY_Y = 8f;
 
-    // 낙하 데미지
+    // 낙하 데미지 속도
     float FALL_MAX_VELOCITY = -5.5f;
     float FALL_MIN_VELOCITY = -9f;
 
     // Damage System
     private DamageManager damageManager;
-    private int SAND_DAMAGE;
+    public int SAND_DAMAGE;
 
     // Block Detection
     [SerializeField] private LayerMask targetLayer;
@@ -79,7 +80,6 @@ public class PlayerController : MonoBehaviour
 
     // AudioSource
     public AudioSource jetpackAudioSourse;
-    private bool isplayingjetpack = false;
 
     public AudioSource footstepAudioSourse01;
     public AudioSource footstepAudioSourse02;
@@ -89,6 +89,8 @@ public class PlayerController : MonoBehaviour
     private GameObject jetpackEffect; // 이펙트 오브젝트
 
     public BlocksDictionary blocksDictionary;
+    Block block;
+
     #endregion Field
 
     #region InputAction
@@ -204,17 +206,6 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        damageManager = new DamageManager();
-
-        SAND_DAMAGE = damageManager.GetDamage(LoadScene.instance.difficulty_level,
-                ObstacleType.Sand);
-        fallDamageH = damageManager.GetDamage(LoadScene.instance.difficulty_level,
-               ObstacleType.Fall_High);
-        fallDamageM = damageManager.GetDamage(LoadScene.instance.difficulty_level,
-               ObstacleType.Fall_Mid);
-        fallDamageL = damageManager.GetDamage(LoadScene.instance.difficulty_level,
-               ObstacleType.Fall_Low);
-
         _state = PlayerState.NONE;
         jetpackEffect = GameObject.Find("Ef_Jetpack");
     }
@@ -227,7 +218,28 @@ public class PlayerController : MonoBehaviour
 
         if(hit.collider != null)
         {
-            isGround = true;
+            if(hit.collider.gameObject.TryGetComponent<Block>(out block))
+            {
+                if(block.blockType != 1)
+                {
+                    isGround = true;
+                    isFlying = false;
+                }
+                else
+                {
+                    isGround = false;
+                    isFlying = false;
+                }
+            }
+            else
+            {
+                isGround = true;
+                isFlying = false;
+            }
+        }
+        else if(input.y <= 0 && !isGround)
+        {
+            isGround = false;
             isFlying = false;
         }
         else
@@ -290,19 +302,29 @@ public class PlayerController : MonoBehaviour
         {
             if(transform.position.y == initPosY)
                 depth = 0.0f;
+            else if(playerScript.isInMuseum)
+            {
+                depth = 0.0f;
+                return;
+            }
 
             float distance = transform.position.y - initPosY;
             depth = distance;
+
+            if(depth >= 0.0f)
+                depth = 0.0f;
         }
         else
         {
             depth = transform.position.y;
 
-            if(depth >= 0.0f)
+            if(playerScript.isInMuseum)
+                depth = 0.0f;
+            else if(depth >= 0.0f)
                 depth = 0.0f;
         }
 
-        UIController.Instance.SetText(1, Mathf.Abs(depth).ToString("F1") + "m");
+        UIController.Instance.SetText(1, depth.ToString("F1") + "m");
     }
 
     // 모래에 갇혔음을 액션 바인드하기
@@ -394,6 +416,11 @@ public class PlayerController : MonoBehaviour
 
             // 떨어지는 중일 때 플레이어가 하강속도보다 낮은 속도이기 때문에 속도를 높이기 위해 변수를 곱함.
             velocity.y += direction.y * (velocity.y < 0 ? speed * extraAcceleration : speed) * Time.fixedDeltaTime;
+
+            if(!jetpackAudioSourse.isPlaying)
+            {
+                jetpackAudioSourse.Play();
+            }
         }
         else if(!isGround)
         {
@@ -401,6 +428,8 @@ public class PlayerController : MonoBehaviour
             //    velocity.y = 0;
 
             velocity.y += gravity * Time.fixedDeltaTime;
+
+            jetpackAudioSourse.Stop();
         }
 
         // 속도 제한

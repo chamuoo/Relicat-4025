@@ -93,6 +93,7 @@ public class Tool : MonoBehaviour
         ReplaceToolComponent(slot.slot.weapon);
         currentWeapon.SetInstance(slot.slot.weapon);
 
+        sprite.sprite = currentWeapon.Instance.itemImage;
         SlotManager.Instance.SelectSlot(slot);
     }
 

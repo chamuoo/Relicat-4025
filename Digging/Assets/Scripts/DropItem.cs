@@ -118,14 +118,14 @@ public class DropItem : MonoBehaviour
                     playerScript.Inventory.AddItem(playerScript.Drill_Items[itemCode], addEA);
                     
                     SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[13]);
-                    Inventory.instance.LogMessage("드릴 부품을 획득했습니다.");
+                    Inventory.Instance.LogMessage("드릴 부품을 획득했습니다.");
                 }
                 else if (itemType == 4) // 이 아이템이 드릴 배터리 아이템이라면
                 {
                     // 드릴이라는 아이템이 퀵슬롯에 있다면 배터리 채우기
                     if(SlotManager.Instance.quitSlotUI.FindSlot(ItemTypes.Drill) && Shop.instance.isCreateDrill == true)
                     {
-                        Inventory.instance.LogMessage("드릴의 배터리가 충전되었습니다.");
+                        Inventory.Instance.LogMessage("드릴의 배터리가 충전되었습니다.");
                         SlotManager.Instance.ChargeEnergy();
                     }
                     else
@@ -175,14 +175,14 @@ public class DropItem : MonoBehaviour
                 {
                     playerScript.Inventory.AddItem(playerScript.Drill_Items[itemCode], addEA);
                     SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[13]);
-                    Inventory.instance.LogMessage("드릴 부품을 획득했습니다.");
+                    Inventory.Instance.LogMessage("드릴 부품을 획득했습니다.");
                 }
                 else if (itemType == 4) // 이 아이템이 드릴 배터리 아이템이라면
                 {
                     // 드릴이라는 아이템이 퀵슬롯에 있다면 배터리 채우기
                     if(SlotManager.Instance.quitSlotUI.FindSlot(ItemTypes.Drill) && Shop.instance.isCreateDrill == true)
                     {
-                        Inventory.instance.LogMessage("드릴의 배터리가 충전되었습니다.");
+                        Inventory.Instance.LogMessage("드릴의 배터리가 충전되었습니다.");
                         SlotManager.Instance.ChargeEnergy();
                     }
                     else

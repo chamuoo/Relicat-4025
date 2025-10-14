@@ -128,6 +128,9 @@ public class LevelManager : MonoBehaviour
     // 매 씬이 로드가 될 때마다
     private void OnSceneLoaded3(Scene scene, LoadSceneMode mode)
     {
+        UIController.Instance.SetObjectActive(0, false);
+        UIController.Instance.SetObjectActive(1, false);
+
         //if (scene.buildIndex != 2) return;
         //if(scene.buildIndex != 3) return;
 
@@ -567,6 +570,7 @@ public class LevelManager : MonoBehaviour
 
         collection.Inventory.money_item.count = 0;
         collection.Inventory.ClearItem();
+        SlotManager.Instance.quitSlotUI.ClearAllSlots();
 
         collection.li_isCollect = new bool[collection.player.items.Count];
         collection.li_isRelicOnTable = new bool[collection.player.items.Count];

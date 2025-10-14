@@ -11,12 +11,12 @@ using UnityEditor.SearchService;
 
 using System.Collections.ObjectModel;
 using Unity.VisualScripting;
-using UnityEngine.PlayerLoop;
-using System.Linq;
 
 public class Player : MonoBehaviour
 {
-    public static Inventory instance;
+    private DamageManager damageManager;
+
+    //public static Inventory instance;
     public Inventory Inventory;
     public Collection Collection;
     public Shop Shop;
@@ -78,10 +78,11 @@ public class Player : MonoBehaviour
     public Dictionary<string, bool> DicPlayerHeart = new Dictionary<string, bool>();
 
     // 플레이어 HP
-    public PlayerHPBar hPBar;
+    [SerializeField] PlayerHPBar hPBar;
     float init_maxHP = 1;
     public float total_maxHP;
     float _currentHP;
+    public float HP => _currentHP;
 
     // 일시정지
     [SerializeField] private GameObject PausePanel;
@@ -111,7 +112,7 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         // 아이템 초기화
-        //for (int i = 0; i < items.Count; i++)
+        /*for (int i = 0; i < items.Count; i++)
         //{
         //    items[i].count = 0;
         //    items[i].accumulation_count = 0;
@@ -140,10 +141,17 @@ public class Player : MonoBehaviour
         
         //if(!File.Exists(savePath))  // 저장 없을 때
         //    InitItemCount();
+        */
+
+        player = GetComponent<PlayerController>();
+
     }
 
     private void OnEnable()
     {
+        if(hPBar != null) 
+            hPBar = transform.parent.GetComponentInChildren<PlayerHPBar>();
+
         SlotManager.Instance.OnInventoryOpen = SlotManager.Instance.HandleInventoryOpen;
     }
 
@@ -155,8 +163,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     private IEnumerator Start()
     {
-        UIController.Instance.SetObjectActive(0, true);
-        UIController.Instance.SetObjectActive(1, true);
+        damageManager = new DamageManager();
 
         // UI 시작/도착 포지션 지정
         Inventory_StartPos = new Vector3(-200f, Screen.height / 2, 0f);
@@ -167,6 +174,9 @@ public class Player : MonoBehaviour
 
         Collect_StartPos = new Vector3(3420f, Screen.height / 2, 0f);
         Collect_EndPos = new Vector3(1920f, Screen.height / 2, 0f);
+
+        UIController.Instance.SetObjectActive(0, true);
+        UIController.Instance.SetObjectActive(1, true);
 
         Tool.Instance.torchObj.Clear();
         // 한 프레임 대기 (인스턴스 초기화 대기)
@@ -235,6 +245,7 @@ public class Player : MonoBehaviour
         LevelManager.instance.pause_Button.SetActive(true);
         LevelManager.instance.isRunning = true;
 
+
         if(LevelManager.instance.isClickReset)
         {
             LevelManager.instance.isClickReset = false;
@@ -291,9 +302,26 @@ public class Player : MonoBehaviour
             SaveSystem.Instance.Save();
         }
 
+        player.SAND_DAMAGE = damageManager.GetDamage(LoadScene.instance.difficulty_level,
+        ObstacleType.Sand);
+        player.fallDamageH = damageManager.GetDamage(LoadScene.instance.difficulty_level,
+               ObstacleType.Fall_High);
+        player.fallDamageM = damageManager.GetDamage(LoadScene.instance.difficulty_level,
+               ObstacleType.Fall_Mid);
+        player.fallDamageL = damageManager.GetDamage(LoadScene.instance.difficulty_level,
+               ObstacleType.Fall_Low);
+
         // 초기 HP
-        total_maxHP = init_maxHP + (UpgradeItems[2].count - 1);
-        _currentHP = total_maxHP;
+        if(_currentHP > 0)
+        {
+            _currentHP = HP;
+        }
+        else
+        {
+            total_maxHP = init_maxHP + (UpgradeItems[2].count - 1);
+            _currentHP = total_maxHP;
+        }
+            
         SetHP();
     }
 
@@ -302,6 +330,7 @@ public class Player : MonoBehaviour
     {
         currentTime += Time.deltaTime;
 
+        // 곡괭이 업그레이드
         if(UpgradeItems[0].count >= 21)
         {
             //pick_obj.GetComponent<SpriteRenderer>().sprite = pick_imgs[3];
@@ -422,7 +451,6 @@ public class Player : MonoBehaviour
     public void Reset_SaveFile_and_GoMenu()
     {
         SaveSystem.Instance.DeleteSaveFile();
-        SaveSystem.Instance.DeleteSaveFile();
         LoadScene.instance.isAlreadyWatchStory = false;
         LevelManager.instance.remainingTime = LevelManager.instance.totalTime_1;
         LevelManager.instance.Restart_Go_Menu_Button();
@@ -430,8 +458,6 @@ public class Player : MonoBehaviour
         Inventory.badgePanel.SetActive(false);
         Inventory.moneyPanel.SetActive(false);
         Inventory.healthPanel.SetActive(false);
-        UIController.Instance.SetObjectActive(0, false);
-        UIController.Instance.SetObjectActive(1, false);
         LevelManager.instance.stagetargetUI.SetActive(false);
         LevelManager.instance.ClearStagePanel_1.SetActive(false);
         LevelManager.instance.ClearStagePanel_2.SetActive(false);
@@ -502,8 +528,6 @@ public class Player : MonoBehaviour
     {
         SceneManager.LoadScene("Menu");
         LoadScene.instance.MainMenu.SetActive(true);
-        UIController.Instance.SetObjectActive(0, false);    // 퀵슬롯 
-        UIController.Instance.SetObjectActive(1, false);    // 깊이
         Inventory_obj.SetActive(false);
         Inventory.badgePanel.SetActive(false);
         Inventory.moneyPanel.SetActive(false);
@@ -511,11 +535,20 @@ public class Player : MonoBehaviour
         LevelManager.instance.stagetargetUI.SetActive(false);
         LevelManager.instance.guide_Button.SetActive(false);
         LevelManager.instance.pause_Button.SetActive(false);
+
+
     }
 
     // 인벤토리 상호작용
     private void Interaction_Inventory()
     {
+        if(Input.GetKeyDown(KeyCode.Tab) && !isInventoryMoving && !isOnShop && !isOnCollect)
+        {
+            currentTime = 0f;
+            isInventoryMoving = true;
+            SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[29]);
+        }
+
         if(Input.GetKeyDown(KeyCode.Tab) && !isInventoryMoving && !isOnShop && !isOnCollect)
         {
             currentTime = 0f;
@@ -588,7 +621,6 @@ public class Player : MonoBehaviour
             player.DisableControl(1);
 
             currentTime = 0f;
-            currentTime = 0f;
             SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[29]);
             if(isOnInventory && !isOnShop)
             {
@@ -600,7 +632,6 @@ public class Player : MonoBehaviour
                 isShopMoving = true;
                 isInventoryMoving = true;
             }
-
             Shop.shop_pickLvText.text = "레벨 : " + UpgradeItems[0].count;
             Shop.shop_lightLvText.text = "레벨 : " + UpgradeItems[1].count;
             Shop.shop_hpLvText.text = "레벨 : " + UpgradeItems[2].count;
@@ -612,10 +643,10 @@ public class Player : MonoBehaviour
         }
         else if(!isNearShop && isOnShop && !isInventoryMoving && !isShopMoving)
         {
-            player.EnableControl(1);
             currentTime = 0f;
             isInventoryMoving = true;
             isShopMoving = true;
+
         }
 
         // 박물관 상호작용
@@ -646,7 +677,6 @@ public class Player : MonoBehaviour
 
 
             }
-            // 박물관 안
             else if(isInMuseum && isActiveMuseum == false)
             {
                 player.DisableControls();
@@ -654,6 +684,7 @@ public class Player : MonoBehaviour
                 FadeEffect.Instance.OnFade(FadeState.FadeInOut);
                 Invoke("InvokeOutMuseum", 1.5f);
                 SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[17]);
+
             }
 
         }
@@ -661,36 +692,9 @@ public class Player : MonoBehaviour
         // 박물관 입구 되돌아가기
         if(isNearReturnMuseum && Input.GetKeyDown(KeyCode.F))
         {
-            player.DisableControls();
             FadeEffect.Instance.OnFade(FadeState.FadeInOut);
             Invoke("InvokeInMuseum", 1.5f);
             SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[29]);
-        }
-
-        // 도감 UI 이동 애니메이션
-        if(isCollectMoving && !isOnCollect)
-        {
-            currentTime += Time.deltaTime;
-            float t = Mathf.Clamp01(currentTime / moveTime);
-            CollectUIPanel.transform.position = Vector3.Lerp(Collect_StartPos, Collect_EndPos, t);
-
-            if(t >= moveTime)
-            {
-                isCollectMoving = false; // 애니메이션 완료
-                isOnCollect = true;
-            }
-        }
-        else if(isCollectMoving && isOnCollect)
-        {
-            currentTime += Time.deltaTime;
-            float t = Mathf.Clamp01(currentTime / moveTime);
-            CollectUIPanel.transform.position = Vector3.Lerp(Collect_EndPos, Collect_StartPos, t);
-
-            if(t >= moveTime)
-            {
-                isCollectMoving = false; // 애니메이션 완료
-                isOnCollect = false;
-            }
         }
 
         // 도감 상호작용
@@ -733,7 +737,6 @@ public class Player : MonoBehaviour
         // 튜토리얼 탈출
         if(isNearTutorialExit && Input.GetKeyDown(KeyCode.F))
         {
-            player.DisableControls();
             LoadScene.instance.GoMain();
             SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[29]);
         }
@@ -742,30 +745,48 @@ public class Player : MonoBehaviour
     // 지형 리셋 버튼
     public void Reset_Ground_Button()
     {
-        LoadScene.instance.GoMain();
-        isOnResetUI = false;
-        ResetPanel.SetActive(false);
-        SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[35]);
-        LevelManager.instance.isClickReset = true;
-        SaveSystem.Instance.Save();
+        if (UseItems[5].count > 0)
+        {
+            UseItems[5].count--;
+            if (UseItems[5].count == 0)
+            {
+                Inventory.SellItem(UseItems[5]);
+            }
+
+            LoadScene.instance.GoMain();
+
+            isOnResetUI = false;
+            ResetPanel.SetActive(false);
+            SavePanel.SetActive(false);
+            SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[35]);
+            LevelManager.instance.isClickReset = true;
+            SaveSystem.Instance.Save();
+        }
+        else
+        {
+            Inventory.LogMessage("리셋 티켓이 부족합니다");
+        }
+
     }
 
     public void Reset_Close_Button()
     {
+        player.EnableControls();
         isOnResetUI = false;
         ResetPanel.SetActive(false);
         SavePanel.SetActive(false);
-        player.EnableControls();
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[28]);
+
     }
 
-    // 세이브 버튼
     public void Save_Button()
     {
         SaveSystem.Instance.Save();
-        GroundAutoHeal();
+
         Inventory.LogMessage("세이브 되었습니다");
+        GroundAutoHeal();
         SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[34]);
+
     }
 
     // 박물관 입장/퇴장 페이드 인아웃
@@ -788,6 +809,7 @@ public class Player : MonoBehaviour
     void InvokeOutMuseum()
     {
         player.EnableControls();
+
         gameObject.transform.position = new Vector3(18f, 0.5f, 0f);
         isInMuseum = false;
         isActiveMuseum = false;
@@ -801,7 +823,6 @@ public class Player : MonoBehaviour
         }
     }
 
-    // 리스폰 버튼
     public void Respawn_Button()
     {
         // 돈이 있으면 부활
@@ -825,11 +846,9 @@ public class Player : MonoBehaviour
 
     public void Restart_LastSave()
     {
-        SlotManager.Instance.quitSlotUI.ClearAllSlots();
         DiePanel.SetActive(false);
         isPaused = false;
         LevelManager.instance.isRunning = true;
-        //hPBar.UpdateHP(100);
         //Time.timeScale = 1f; // 게임 재개
         //AddPlayerLife(3);
 
@@ -865,7 +884,8 @@ public class Player : MonoBehaviour
 
     }
 
-    //플레이어 체력 깎기
+
+    // 플레이어 체력 깎기
     public void LostPlayerLife(int hp)
     {
 
@@ -879,6 +899,7 @@ public class Player : MonoBehaviour
                 if(DicPlayerHeart[li_PlayerHearts[0].name] == false)
                 {
                     player.DisableControls();
+
                     DiePanel.SetActive(true);
                     isPaused = true;
                     LevelManager.instance.isRunning = false;
@@ -934,7 +955,7 @@ public class Player : MonoBehaviour
     {
         total_maxHP = init_maxHP + (UpgradeItems[2].count - 1);
         float ratio = (float)_currentHP / total_maxHP;
-        hPBar.UpdateHP(ratio);
+        if(hPBar != null) hPBar.UpdateHP(ratio);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -991,6 +1012,7 @@ public class Player : MonoBehaviour
         if(other.CompareTag("Shop"))
         {
             isNearShop = false;
+            player.EnableControls();
             Debug.Log("상점에서 벗어났습니다.");
         }
         if(other.CompareTag("Museum"))
@@ -1011,16 +1033,19 @@ public class Player : MonoBehaviour
         if(other.CompareTag("Reset"))
         {
             isNearReset = false;
+            player.EnableControls();
             Debug.Log("리셋에서 벗어났습니다.");
         }
         if(other.CompareTag("ReturnMuseum"))
         {
             isNearReturnMuseum = false;
+            player.EnableControls();
             Debug.Log("리턴에서 벗어났습니다.");
         }
         if(other.CompareTag("tutorialExit"))
         {
             isNearTutorialExit = false;
+            player.EnableControls();
             Debug.Log("튜토리얼 탈출에서 벗어났습니다.");
         }
     }

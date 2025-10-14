@@ -245,9 +245,12 @@ public class SlotManager : Singleton<SlotManager>
         foreach(Item item in inventory.items)
         {
             if(item == null || !item.name.StartsWith("Item_Use"))
-                return;
+                continue;
 
-            // UI
+            string suffix = item.name.Substring("Item_Use".Length);
+            if(suffix != "01" && suffix != "02" && suffix != "03")
+                continue;
+
             GiveItem(item.type, item.count);
 
             // 나중에 아이템에 대한 제한 개수가 있다면 쓸 예정
