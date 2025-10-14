@@ -344,6 +344,8 @@ public class SlotManager : Singleton<SlotManager>
 
     public void LoadQuickSlots(SaveData loaded)
     {
+        WeaponInstance drillWeapon = null;
+
         // 1. 저장된 슬롯 데이터 복원
         foreach(var saved in loaded.quickSlotInfoData.slots)
         {
@@ -362,7 +364,12 @@ public class SlotManager : Singleton<SlotManager>
                 UIController.Instance.SetSlotText(slot, 1);
 
                 // Tool 딕셔너리에도 등록
-                Tool.Instance.SetData(saved.data.weapon._id, saved.data.weapon); 
+                Tool.Instance.SetData(saved.data.weapon._id, saved.data.weapon);
+
+                if(saved.data.weapon._template.name == "Drill")
+                {
+                    drillWeapon = saved.data.weapon;
+                }
             }
             // 아이템 인스턴스 복원
             else if(saved.data.item != null && saved.data.item._item != null)
@@ -384,6 +391,31 @@ public class SlotManager : Singleton<SlotManager>
                 Tool.Instance.EquipWeapon(weaponSlot);
             }
         }
+
+        if(drillWeapon == null) return;
+
+        GameObject clone = energyClone;
+
+        // 없으면 생성
+        if(clone == null)
+        {
+            SlotInfo slot = quitSlotUI.FindSlot(ItemTypes.Drill);
+
+            var parent = slot.transform.GetChild(slot.transform.childCount - 1);
+            clone = Instantiate(energy, parent);
+
+            var rect = clone.GetComponent<RectTransform>();
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = new Vector2(0, -40f);
+            rect.sizeDelta = new Vector2(80, 30);
+
+            energyClone = clone;
+            clone.GetComponent<EnergyBar>().SetValue(drillWeapon._energy);
+        }
+
+        // 있으면 무조건 켬
+        clone.SetActive(true);
+        clone.GetComponent<EnergyBar>().SetValue(drillWeapon._energy);
     }
 
     #endregion Func

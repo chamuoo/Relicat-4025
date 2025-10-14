@@ -192,6 +192,7 @@ public class Drill : MonoBehaviour, IWeapon
 
         if(isDigging)
         {
+            // 드릴 속도
             t += Time.deltaTime * (_instance._damage / 2);
             t = Mathf.Clamp01(t);
 

@@ -202,6 +202,7 @@ public class Pickaxe : MonoBehaviour, IWeapon
 
         if(isDigging)
         {
+            // °î±ªÀÌ ¼Óµµ
             t += Time.deltaTime * (_instance._damage / 4);
             t = Mathf.Clamp01(t);
 

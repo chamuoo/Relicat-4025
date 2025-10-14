@@ -24,7 +24,11 @@ public class PlayerController : MonoBehaviour
     }
     public PlayerState _state;
 
-    float initPosY;
+    float originalInitY, initPosY; // 초기 위치들
+    float DELTA_Y = 0.45f;  // 높이 차이 허용차
+
+    // 박물관 진입 상태 
+    int prevMuseumState = 0; // 0: 밖, 1: 안
 
     // Component References
     private InputAction[] _contorl;
@@ -193,7 +197,6 @@ public class PlayerController : MonoBehaviour
         playerScript = GetComponent<Player>();
 
         SetControl("Move", "Action");
-        initPosY = transform.position.y;    // 현재 초기 위치
 
         targetLayer = LayerMask.GetMask("Block", "Floor");
 
@@ -206,6 +209,8 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        initPosY = originalInitY = transform.position.y;
+
         _state = PlayerState.NONE;
         jetpackEffect = GameObject.Find("Ef_Jetpack");
     }
@@ -298,33 +303,22 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateDepth()
     {
-        if(LoadScene.Instance.stage_Level == 0)
-        {
-            if(transform.position.y == initPosY)
-                depth = 0.0f;
-            else if(playerScript.isInMuseum)
-            {
-                depth = 0.0f;
-                return;
-            }
+        // 박물관 | 안: 1, 밖: 0 (현재 상태)
+        int isIn = playerScript.isInMuseum ? 1 : 0;
 
-            float distance = transform.position.y - initPosY;
-            depth = distance;
+        // 진입상태가 바뀐 순간 -> 들어가면 = 현재위치, 나가면 = 원래 위치
+        initPosY = prevMuseumState != isIn 
+            ? (isIn == 1 ? transform.position.y : originalInitY)
+            : initPosY;
 
-            if(depth >= 0.0f)
-                depth = 0.0f;
-        }
-        else
-        {
-            depth = transform.position.y;
+        prevMuseumState = isIn;
 
-            if(playerScript.isInMuseum)
-                depth = 0.0f;
-            else if(depth >= 0.0f)
-                depth = 0.0f;
-        }
+        float deltaY = transform.position.y - initPosY;
 
-        UIController.Instance.SetText(1, depth.ToString("F1") + "m");
+        depth = Mathf.Abs(deltaY) < DELTA_Y ? 0.0f : deltaY;
+        UIController.Instance.SetText(1, $"{depth:F1}m");
+
+        //Debug.Log($"플레이어 위치: {depth}, 초기위치: {initPosY}");
     }
 
     // 모래에 갇혔음을 액션 바인드하기

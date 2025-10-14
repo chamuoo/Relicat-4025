@@ -97,6 +97,7 @@ public class DropItem : MonoBehaviour
                 {
                     playerScript.Inventory.AddItem(playerScript.minerals[itemCode], addEA);
                     SoundManager.Instance.SFXPlay(SoundManager.Instance.SFXSounds[13]);
+                    //SlotManager.Instance.ChargeEnergy(); // 에너지 충전 테스트용
                 }
                 else if(itemType == 2) // 이 아이템이 사용 아이템이라면
                 {

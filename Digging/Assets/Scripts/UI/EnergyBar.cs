@@ -22,8 +22,9 @@ public class EnergyBar : MonoBehaviour
         slider.value = value / 100f;
         print("¿¡³ÊÁö: " + value + slider.value);
 
-        Color fillColor;
+        slider.gameObject.SetActive(slider.value < 1.0f);
 
+        Color fillColor;
         if(slider.value > 0.5f)
             fillColor = Color.Lerp(Color.yellow, Color.green, (value - 0.5f) * 2f);
         else

@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     public Collection Collection;
     public Shop Shop;
     public PlayerController player;
-
+    public Vector3 playerInMuseumPos;
 
     public List<Item> items;
     public List<Item> minerals;
@@ -796,6 +796,7 @@ public class Player : MonoBehaviour
 
         gameObject.transform.position = new Vector3(250f, 0.5f, 0f);
         isInMuseum = true;
+        playerInMuseumPos = transform.position;
         isActiveMuseum = false;
 
         if(SoundManager.Instance.BGMSoundPlay.isPlaying)
@@ -812,6 +813,7 @@ public class Player : MonoBehaviour
 
         gameObject.transform.position = new Vector3(18f, 0.5f, 0f);
         isInMuseum = false;
+        playerInMuseumPos = transform.position;
         isActiveMuseum = false;
 
         if(SoundManager.Instance.BGMSoundPlay.isPlaying)
